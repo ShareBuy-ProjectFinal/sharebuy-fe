@@ -1,0 +1,18 @@
+export const PATH = {
+  home: '/',
+  login: '/login',
+  all: '*',
+  profile: '/profile',
+  dashboard: '/dashboard',
+  order: '/order',
+  product: '/product',
+  category: '/category',
+  customer: '/customer',
+  report: '/report',
+  salesdeal: '/salesdeal',
+  chat: '/chat',
+  Knowledge: '/Knowledge',
+  productUpdates: '/productUpdates',
+  settingsUser: '/settingsUser',
+  settingsCommunity: '/settingsCommunity',
+};
