@@ -37,6 +37,7 @@ const UserProvider = ({ children }: { children: ReactNode }): JSX.Element => {
       setIsLoading(false);
     },
     onError: (error) => {
+      console.log('error', error);
       handleRemoveToken();
       setIsLoading(false);
     },

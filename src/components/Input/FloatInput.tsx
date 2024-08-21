@@ -18,8 +18,6 @@ const FloatInput = (props: IProps) => {
     type,
     required,
     password = false,
-    error = false,
-    status,
     getFieldError,
     name,
   } = props;
