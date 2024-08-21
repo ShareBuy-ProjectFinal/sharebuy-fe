@@ -5,7 +5,7 @@ const DashboardPage = () => {
   useEffect(() => {
     console.log('auth', auth);
   }, []);
-  return <div>DashboardPage</div>;
+  return <div>DashboardPage New</div>;
 };
 
 export default DashboardPage;
