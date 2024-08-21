@@ -44,7 +44,3 @@ code {
 .as-label {
   color: #1677ff;
 }
-
-.custom-input:focus {
-  background-color: red !important;
-}

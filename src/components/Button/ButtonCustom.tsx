@@ -2,17 +2,17 @@ import { Button, ButtonProps, Table, TableProps } from 'antd';
 import React from 'react';
 
 // interface a extends React.PropsWithChildren<TableProps> & React.RefAttributes<Reference>
-type CustomButtonProps = Omit<ButtonProps, 'type'>;
+// type CustomButtonProps = Omit<ButtonProps, 'type'>;
 
 interface IProps
-  extends React.PropsWithChildren<CustomButtonProps>,
+  extends React.PropsWithChildren<ButtonProps>,
     React.RefAttributes<HTMLButtonElement | HTMLAnchorElement> {
-  type?: 'button' | 'submit' | 'reset';
   custumClass?: string;
 }
 const ButtonCustom = (props: IProps) => {
   const {
     type,
+    htmlType = 'submit',
     disabled,
     className,
     custumClass,
@@ -23,7 +23,7 @@ const ButtonCustom = (props: IProps) => {
   // <Button />;
   return (
     <button
-      type={type}
+      type={htmlType}
       onClick={onClick}
       disabled={disabled}
       className={

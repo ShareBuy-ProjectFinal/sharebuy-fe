@@ -1,5 +1,6 @@
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Dropdown, Flex, Image, MenuProps } from 'antd';
+import { auth } from 'configs/firebaseConfig';
 import React from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
@@ -8,6 +9,8 @@ const Avatar = () => {
   const navigate = useNavigate();
   const signOut = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('email');
+    auth.signOut();
     navigate(PATH.login);
   };
 

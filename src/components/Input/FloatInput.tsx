@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Input, InputProps } from 'antd';
 import { EyeIcon, EyeOffIcon } from 'assets/svgs';
 
@@ -7,9 +7,22 @@ interface IProps extends InputProps {
   required?: boolean;
   value?: any;
   password?: boolean;
+  error?: boolean;
+  getFieldError?: any;
 }
 const FloatInput = (props: IProps) => {
-  const { label, value, placeholder, type, required, password = false } = props;
+  const {
+    label,
+    value,
+    placeholder,
+    type,
+    required,
+    password = false,
+    error = false,
+    status,
+    getFieldError,
+    name,
+  } = props;
 
   const [focus, setFocus] = useState(false);
   const [hover, setHover] = useState(false);
@@ -43,7 +56,7 @@ const FloatInput = (props: IProps) => {
         />
       )}
       <label
-        className={focus || hover ? 'labelF as-label' : 'labelF as-placeholder'}
+        className={`labelF ${getFieldError && getFieldError(name).length > 0 ? 'text-red-500' : focus || hover ? 'as-label' : 'as-placeholder'} `}
       >
         {label} {requiredMark}
       </label>

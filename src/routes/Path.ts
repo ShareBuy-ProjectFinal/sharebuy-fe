@@ -1,7 +1,10 @@
 export const PATH = {
+  all: '*',
   home: '/',
   login: '/login',
-  all: '*',
+  register: '/register',
+  forgotPassword: '/forgot-password',
+  term: '/term',
   profile: '/profile',
   dashboard: '/dashboard',
   order: '/order',

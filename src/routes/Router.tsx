@@ -8,6 +8,18 @@ import {
 import { PATH } from './Path';
 import { MainLayout } from 'layouts/MainLayout';
 import Login from 'pages/Auth/LogIn/Login';
+import {
+  CategoryPage,
+  CustomerPage,
+  DashboardPage,
+  InboxPage,
+  OrderPage,
+  ProdcutPage,
+  RegisterPage,
+  ReportPage,
+  SaleDealPage,
+} from 'pages';
+import ForgotPasswordPage from 'pages/Auth/ForgotPassword/ForgotPasswordPage';
 
 export const Router = () => {
   const routers: RouteObject[] = [
@@ -17,39 +29,39 @@ export const Router = () => {
       children: [
         {
           path: PATH.home,
-          element: <div className="bg-red-300 h-full">Home</div>,
+          element: <DashboardPage />,
         },
         {
           path: PATH.dashboard,
-          element: <div className="bg-red-300 h-full">Dashboard</div>,
+          element: <DashboardPage />,
         },
         {
           path: PATH.product,
-          element: <div className="bg-red-300 h-full">Product</div>,
+          element: <ProdcutPage />,
         },
         {
           path: PATH.order,
-          element: <div className="bg-red-300 h-full">Order</div>,
+          element: <OrderPage />,
         },
         {
           path: PATH.category,
-          element: <div className="bg-red-300 h-full">Category</div>,
+          element: <CategoryPage />,
         },
         {
           path: PATH.customer,
-          element: <div className="bg-red-300 h-full">Customer</div>,
+          element: <CustomerPage />,
         },
         {
           path: PATH.report,
-          element: <div className="bg-red-300 h-full">Report</div>,
+          element: <ReportPage />,
         },
         {
           path: PATH.salesdeal,
-          element: <div className="bg-red-300 h-full">Salesdeal</div>,
+          element: <SaleDealPage />,
         },
         {
           path: PATH.chat,
-          element: <div className="bg-red-300 h-full">Chat</div>,
+          element: <InboxPage />,
         },
         {
           path: PATH.Knowledge,
@@ -82,7 +94,9 @@ export const Router = () => {
       ],
     },
     { path: PATH.login, element: <Login /> },
-    // { path: PATH.all, element: <Navigate to={`${PATH.login}`} /> },
+    { path: PATH.register, element: <RegisterPage /> },
+    { path: PATH.forgotPassword, element: <ForgotPasswordPage /> },
+    { path: PATH.all, element: <Navigate to={`${PATH.login}`} /> },
   ];
   const router = createBrowserRouter(routers);
   return <RouterProvider router={router} />;
