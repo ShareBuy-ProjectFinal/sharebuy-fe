@@ -16,10 +16,7 @@ import { Content } from 'antd/es/layout/layout';
 import LableValue from 'components/Dashboard/LableValue';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import LableCustom from 'components/Text/LableCustom';
-import {
-  dataRecentTransactions,
-  dataTopProducts,
-} from 'mocks/Dashboard/data';
+import { dataRecentTransactions, dataTopProducts } from 'mocks/Dashboard/data';
 import React, { useEffect } from 'react';
 
 const optionTimes = [
