@@ -19,7 +19,7 @@ import LableCustom from 'components/Text/LableCustom';
 import {
   dataRecentTransactions,
   dataTopProducts,
-} from 'mockups/Dashboard/data';
+} from 'mocks/Dashboard/data';
 import React, { useEffect } from 'react';
 
 const optionTimes = [
