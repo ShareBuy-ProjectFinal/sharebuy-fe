@@ -11,11 +11,14 @@ export const MainLayout = () => {
   return (
     <Layout className="min-h-screen">
       <MainHeader />
-      <Layout className="mt-0 bg-[#FFF6F4]">
+      <Layout className="mt-0 bg-[#fef7f5]">
         <Sidebar />
         <Content>
-          <PageTitle />
-          <div className="h-[calc(100%-2.5rem)]">
+          {/* <PageTitle /> */}
+          <div
+            // className="h-[calc(100%-2.5rem)]"
+            className="h-full"
+          >
             <Outlet />
           </div>
         </Content>

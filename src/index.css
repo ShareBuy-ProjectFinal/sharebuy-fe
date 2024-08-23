@@ -44,3 +44,51 @@ code {
 .as-label {
   color: #1677ff;
 }
+
+/* table antd */
+.ant-table-thead .ant-table-cell {
+  font-size: 14px !important;
+  line-height: 10px !important;
+  font-weight: 500 !important;
+  color: #5A607F !important;
+  border: none !important;
+  border-bottom: solid 2px #E6E9F4 !important;
+  background-color: white !important;
+}
+
+.ant-table-thead .ant-table-cell::before {
+  width: 0 !important;
+}
+
+/* Custom name column styling */
+.name-column {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Custom date column styling */
+.date-column {
+  color: #696969;
+}
+
+/* Custom amount column styling */
+.amount-column {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Custom status tag styling */
+.status-tag {
+  /* padding: 2px 8px; */
+  border-radius: 4px;
+}
+
+.status-tag.paid {
+  background-color: #e0f7e0;
+  color: #00c853;
+}
+
+.status-tag.pending {
+  background-color: #e0e0e0;
+  color: #757575;
+}

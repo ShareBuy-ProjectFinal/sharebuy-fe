@@ -11,7 +11,7 @@ import {
   Typography,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
-import { auth, providerGoogle } from 'configs/firebaseConfig';
+import { auth, providerFacebook, providerGoogle } from 'configs/firebaseConfig';
 import { Background } from 'assets/images';
 import {
   AppleIcon,
@@ -39,6 +39,18 @@ const Login = () => {
   const { mutate: mutateLoginGoogle, isPending: isPendingLoginGoogle } =
     useMutation({
       mutationFn: () => signInWithPopup(auth, providerGoogle),
+      onSuccess: (result: any) => {
+        console.log('result', result);
+        navigate('/');
+      },
+      onError: (error: any) => {
+        console.log('Login error: ', error);
+      },
+    });
+
+  const { mutate: mutateLoginFaceBook, isPending: isPendingLoginFaceBook } =
+    useMutation({
+      mutationFn: () => signInWithPopup(auth, providerFacebook),
       onSuccess: (result: any) => {
         console.log('result', result);
         navigate('/');
@@ -186,7 +198,7 @@ const Login = () => {
             <Flex justify="space-between" align="center">
               <ButtonCustom
                 icon={<Facebook />}
-                onClick={() => mutateLoginGoogle()}
+                onClick={() => mutateLoginFaceBook()}
                 htmlType="button"
               />
               <ButtonCustom
