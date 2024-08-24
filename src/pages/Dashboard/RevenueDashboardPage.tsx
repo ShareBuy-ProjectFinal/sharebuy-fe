@@ -1,11 +1,8 @@
-import { BackwardOutlined } from '@ant-design/icons';
 import {
-  Button,
   Col,
-  Dropdown,
+  Divider,
   Flex,
   Image,
-  MenuProps,
   Row,
   Select,
   Space,
@@ -13,8 +10,8 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { Content } from 'antd/es/layout/layout';
-import { DownloadIcon } from 'assets/svgs';
+import { RollBackIcon } from 'assets/svgs';
+import ButtonAdd from 'components/Button/ButtonAdd';
 import ButtonDownload from 'components/Button/ButtonDownload';
 import ButtonHeader from 'components/Button/ButtonHeader';
 import LableValue from 'components/Dashboard/LableValue';
@@ -22,8 +19,8 @@ import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
 import LableCustom from 'components/Text/LableCustom';
 import { dataRecentTransactions, dataTopProducts } from 'mocks/Dashboard/data';
-import React, { useEffect } from 'react';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
 import { toastSucess } from 'utils/toats';
 
@@ -33,8 +30,9 @@ const optionTimes = [
   { label: 'Hôm nay', value: 'today' },
 ];
 
-const DashboardPage = () => {
+const RevenueDashboardPage = () => {
   const navigate = useNavigate();
+
   const columnRecentTransactions = [
     {
       title: 'Tên',
@@ -97,62 +95,29 @@ const DashboardPage = () => {
     },
   ];
 
-  useEffect(() => {
-    // console.log('auth', auth);
-  }, []);
-
   const handleDownload = () => {
     toastSucess('Tải thành công');
   };
 
   return (
     <Flex className="pt-7 pb-5 px-8" vertical gap={20}>
-      <Flex justify="space-between" align="center">
-        <Typography.Text className="text-3xl font-bold">
-          Dashboard
-        </Typography.Text>
-        <ButtonDownload fill onClick={handleDownload} />
-      </Flex>
-
-      <Row justify={'start'} gutter={[25, 15]}>
-        <Col
-          className="w-1/5 min-w-[190px] cursor-pointer"
-          onClick={() => navigate(PATH.revenueDashboard)}
+      <Space direction="vertical" size={2}>
+        <Space
+          className="text-[#7E84A3] cursor-pointer"
+          onClick={() => navigate(PATH.dashboard)}
         >
-          <LableValue
-            label="Tổng doanh thu"
-            value={'$10.540'}
-            footer={'25.2%'}
-          />
-        </Col>
-        <Col className="w-1/5 min-w-[190px]">
-          <LableValue label="Đơn hàng" value={'10.540'} footer={'25.2%'} />
-        </Col>
-        <Col className="w-1/5 min-w-[190px]">
-          <LableValue
-            label="Lượt truy cập"
-            value={'10.540'}
-            footer={'25.2%'}
-            isRaise={false}
-          />
-        </Col>
-        <Col className="w-1/5 min-w-[190px]">
-          <LableValue
-            label="Khách hàng mới"
-            value={'10.540'}
-            footer={'25.2%'}
-            isRaise={false}
-          />
-        </Col>
-        <Col className="w-1/5 min-w-[190px]">
-          <LableValue
-            label="TNgười dùng hiện tại"
-            value={'10.540'}
-            footer={'25.2%'}
-            isRaise={false}
-          />
-        </Col>
-      </Row>
+          <RollBackIcon />
+          Quay lại
+        </Space>
+        <Flex justify="space-between" align="center">
+          <Typography.Text className="text-3xl font-bold">
+            Tổng doanh thu
+          </Typography.Text>
+          <Space>
+            <ButtonDownload fill onClick={handleDownload} />
+          </Space>
+        </Flex>
+      </Space>
 
       <Row gutter={[25, 15]}>
         <Col span={18} className="min-w-[600px]">
@@ -161,7 +126,7 @@ const DashboardPage = () => {
             className="bg-white p-5 px-7 w-full rounded-lg min-h-[400px] shadow-md"
           >
             <Row justify="space-between">
-              <LableCustom value={'Đặt hàng theo thời gian'} />
+              <LableCustom value={'Báo cáo doanh thu'} />
               <Select
                 options={optionTimes}
                 defaultValue={optionTimes[0].value}
@@ -171,33 +136,62 @@ const DashboardPage = () => {
             <Row gutter={[15, 15]}>
               <Col>
                 <LableValue
-                  label={'Người mua hàng hôm qua'}
+                  label={'Doanh thu theo tuần'}
                   value={'1234'}
                   isStyle={false}
+                  reverseOrder
                 />
               </Col>
               <Col>
                 <LableValue
-                  label={'Người mua hàng hôm nay'}
+                  label={'Khấu trừ thuế'}
                   value={'1234'}
                   isStyle={false}
+                  reverseOrder
+                />
+              </Col>
+              <Col>
+                <LableValue
+                  label={'Lượng hàng bán ra'}
+                  value={'1234'}
+                  isStyle={false}
+                  reverseOrder
                 />
               </Col>
             </Row>
           </Space>
         </Col>
-        <Col span={6} className="min-w-[255px]">
+        <Col span={6} className="min-w-[260px]">
           <Space
             className="bg-white p-5 px-7 w-full rounded-lg min-h-[400px] shadow-md"
             direction="vertical"
           >
-            <LableCustom value={'Doanh số 1 tuần qua'} />
+            <LableCustom value={'Trạng thái doanh thu'} />
             <LableValue
-              label={'Đơn hàng đã bán'}
-              value={'1234'}
+              label={'Dự kiến doanh thu sau khi tất toán'}
+              value={'1.500.000đ'}
               isStyle={false}
+              reverseOrder
             />
-            <LableValue label={'Doanh thu'} value={'$12.234'} isStyle={false} />
+            <LableValue
+              label={'Tổng lợi nhuận'}
+              value={'$12.234'}
+              isStyle={false}
+              reverseOrder
+            />
+            <Divider className="my-1 border" />
+            <LableValue
+              label={'Dự kiến doanh thu sau khi tất toán'}
+              value={'1.500.000đ'}
+              isStyle={false}
+              reverseOrder
+            />
+            <LableValue
+              label={'Tổng lợi nhuận'}
+              value={'$12.234'}
+              isStyle={false}
+              reverseOrder
+            />
           </Space>
         </Col>
       </Row>
@@ -228,4 +222,4 @@ const DashboardPage = () => {
   );
 };
 
-export default DashboardPage;
+export default RevenueDashboardPage;

@@ -21,3 +21,7 @@ export { ReactComponent as KnowledgeIcon } from './Knowledge.svg';
 export { ReactComponent as UserIcon } from './User.svg';
 export { ReactComponent as SettingsCommunityIcon } from './SettingsCommunity.svg';
 export { ReactComponent as HomeIcon } from './Home.svg';
+export { ReactComponent as AddIcon } from './Add.svg';
+export { ReactComponent as DownloadIcon } from './Download.svg';
+export { ReactComponent as DownloadBlueIcon } from './DownloadBlue.svg';
+export { ReactComponent as RollBackIcon } from './rollBack.svg';

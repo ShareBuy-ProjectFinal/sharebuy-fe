@@ -16,6 +16,7 @@ code {
     monospace;
 }
 
+/* floating input */
 .float-label {
   position: relative;
 }
@@ -80,6 +81,7 @@ code {
 /* Custom status tag styling */
 .status-tag {
   /* padding: 2px 8px; */
+  /* padding: auto; */
   border-radius: 4px;
 }
 
@@ -91,4 +93,41 @@ code {
 .status-tag.pending {
   background-color: #e0e0e0;
   color: #757575;
+}
+
+/* pagination 1*/
+.paginationCustom1,
+.paginationCustom2 {
+  margin-top: 15px !important;
+  margin-bottom: 0 !important;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.paginationCustom1 {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.paginationCustom1 .ant-pagination-total-text {
+  margin-right: auto;
+}
+
+/* pagination 2*/
+.paginationCustom2 {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.paginationCustom2 .ant-pagination-total-text {
+  order: 1;
+  margin-left: auto;
+}
+
+.paginationCustom2 .ant-pagination-options,
+.paginationCustom2 .ant-pagination-item,
+.paginationCustom2 .ant-pagination-prev,
+.paginationCustom2 .ant-pagination-next {
+  order: 0;
+  margin: 0;
 }

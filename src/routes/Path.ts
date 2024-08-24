@@ -7,6 +7,7 @@ export const PATH = {
   term: '/term',
   profile: '/profile',
   dashboard: '/dashboard',
+  revenueDashboard: '/dashboard/revenue',
   order: '/order',
   product: '/product',
   category: '/category',

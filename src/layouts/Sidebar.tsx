@@ -29,7 +29,7 @@ import { PATH } from 'routes/Path';
 type MenuItem = Required<MenuProps>['items'][number];
 
 const selectedKeys = [
-  [PATH.dashboard],
+  [PATH.dashboard, PATH.revenueDashboard, PATH.home],
   [PATH.order],
   [PATH.product],
   [PATH.category],

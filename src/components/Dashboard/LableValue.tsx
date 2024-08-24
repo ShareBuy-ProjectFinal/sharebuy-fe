@@ -8,6 +8,7 @@ interface IProps {
   footer?: any;
   isRaise?: boolean;
   isStyle?: boolean;
+  reverseOrder?: boolean;
 }
 
 const LableValue = ({
@@ -16,15 +17,33 @@ const LableValue = ({
   footer,
   isRaise = true,
   isStyle = true,
+  reverseOrder = false,
 }: IProps) => {
   return (
     <Space
-      className={isStyle ? 'bg-white shadow-md w-full p-3 pl-5 rounded-lg' : ''}
+      className={
+        isStyle
+          ? 'bg-white shadow-md w-full p-3 pl-5 rounded-lg min-w-36'
+          : 'min-w-36'
+      }
       direction="vertical"
       size={0}
     >
-      <Typography.Text className="text-[#5A607F]">{label}</Typography.Text>
-      <Typography.Text className="text-xl font-bold">{value}</Typography.Text>
+      {reverseOrder ? (
+        <>
+          <Typography.Text className="text-xl font-bold">
+            {value}
+          </Typography.Text>
+          <Typography.Text className="text-[#5A607F]">{label}</Typography.Text>
+        </>
+      ) : (
+        <>
+          <Typography.Text className="text-[#5A607F]">{label}</Typography.Text>
+          <Typography.Text className="text-xl font-bold">
+            {value}
+          </Typography.Text>
+        </>
+      )}{' '}
       {footer && (
         <Typography.Text type={`${isRaise ? 'success' : 'danger'}`}>
           {footer}

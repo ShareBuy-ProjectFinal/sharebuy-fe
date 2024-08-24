@@ -20,6 +20,7 @@ import {
   SaleDealPage,
 } from 'pages';
 import ForgotPasswordPage from 'pages/Auth/ForgotPassword/ForgotPasswordPage';
+import RevenueDashboardPage from 'pages/Dashboard/RevenueDashboardPage';
 
 export const Router = () => {
   const routers: RouteObject[] = [
@@ -34,6 +35,10 @@ export const Router = () => {
         {
           path: PATH.dashboard,
           element: <DashboardPage />,
+        },
+        {
+          path: PATH.revenueDashboard,
+          element: <RevenueDashboardPage />,
         },
         {
           path: PATH.product,
