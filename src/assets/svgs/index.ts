@@ -25,3 +25,5 @@ export { ReactComponent as AddIcon } from './Add.svg';
 export { ReactComponent as DownloadIcon } from './Download.svg';
 export { ReactComponent as DownloadBlueIcon } from './DownloadBlue.svg';
 export { ReactComponent as RollBackIcon } from './rollBack.svg';
+export { ReactComponent as EditIcon } from './Edit.svg';
+export { ReactComponent as DeleteIcon } from './Delete.svg';
