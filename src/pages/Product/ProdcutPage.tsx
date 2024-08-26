@@ -9,6 +9,7 @@ import {
   Space,
   Table,
   TableColumnsType,
+  Tag,
   Typography,
 } from 'antd';
 import { ColumnType } from 'antd/es/table';
@@ -19,7 +20,9 @@ import ButtonDownload from 'components/Button/ButtonDownload';
 import PopupConfirm from 'components/Popup/PopupConfirm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
+import TextCustom from 'components/Text/TextCustom';
 import { dataTopProducts } from 'mocks/Dashboard/data';
+import { dataProducts } from 'mocks/Product/data';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toastSucess } from 'utils/toats';
 
@@ -51,20 +54,39 @@ const ProdcutPage = () => {
       ),
     },
     {
-      title: 'Tên',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: any, record: any) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+      title: 'Sản phẩm',
+      dataIndex: 'product',
+      key: 'product',
+      render: (text, record) => (
+        <Space align="center">
           <Image
-            src={record.image}
-            alt={' '}
-            style={{ width: '30px', borderRadius: '4px' }}
-            preview={false}
+            src={record.imageUrl}
+            width={40}
+            height={45}
+            className="rounded-md border-[##bfc1c2] border"
           />
-          <span>{text}</span>
-        </div>
+          <Space direction="vertical" size={0}>
+            <TextCustom value={text} />
+            <TextCustom value={record.category} />
+          </Space>
+        </Space>
       ),
+    },
+    {
+      title: 'Tồn kho',
+      dataIndex: 'inventory',
+      key: 'inventory',
+      render: (text) => {
+        if (text.includes('Out of Stock')) {
+          return <Tag color="error">Hết hàng</Tag>;
+        }
+        return text;
+      },
+    },
+    {
+      title: 'Màu sắc',
+      dataIndex: 'color',
+      key: 'color',
     },
     {
       title: 'Giá',
@@ -72,9 +94,9 @@ const ProdcutPage = () => {
       key: 'price',
     },
     {
-      title: 'Đơn vị bán',
-      dataIndex: 'unitsSold',
-      key: 'unitsSold',
+      title: 'Đánh giá',
+      dataIndex: 'rating',
+      key: 'rating',
     },
   ];
 
@@ -170,7 +192,7 @@ const ProdcutPage = () => {
             <ButtonAction onClick={handleDeleteRow} />
           </Space>
         </Row>
-        <TableCustom columns={columnTopProducts} dataSource={dataTopProducts} />
+        <TableCustom columns={columnTopProducts} dataSource={dataProducts} />
       </SpaceCustom>
       <PopupConfirm
         isOpen={isOpenModal}

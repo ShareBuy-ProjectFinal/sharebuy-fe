@@ -9,6 +9,7 @@ import {
   Space,
   Table,
   TableColumnsType,
+  Tag,
   Typography,
 } from 'antd';
 import { ColumnType } from 'antd/es/table';
@@ -20,6 +21,7 @@ import PopupConfirm from 'components/Popup/PopupConfirm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
 import { dataTopProducts } from 'mocks/Dashboard/data';
+import { dataOrders } from 'mocks/Order/data';
 import React, { useCallback, useEffect, useState } from 'react';
 import { toastSucess } from 'utils/toats';
 
@@ -51,30 +53,48 @@ const OrderPage = () => {
       ),
     },
     {
-      title: 'Tên',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: any, record: any) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          <Image
-            src={record.image}
-            alt={' '}
-            style={{ width: '30px', borderRadius: '4px' }}
-            preview={false}
-          />
-          <span>{text}</span>
-        </div>
-      ),
+      title: 'Đơn hàng',
+      dataIndex: 'order',
+      key: 'order',
     },
     {
-      title: 'Giá',
-      dataIndex: 'price',
-      key: 'price',
+      title: 'Ngày',
+      dataIndex: 'date',
+      key: 'date',
     },
     {
-      title: 'Đơn vị bán',
-      dataIndex: 'unitsSold',
-      key: 'unitsSold',
+      title: 'Khách hàng',
+      dataIndex: 'customer',
+      key: 'customer',
+    },
+    {
+      title: 'Trạng thái thanh toán',
+      dataIndex: 'paymentStatus',
+      key: 'paymentStatus',
+      render: (text) => {
+        // Thay đổi màu sắc hoặc kiểu cho trạng thái thanh toán
+        let color = 'green';
+        if (text === 'Đang mua chung') color = 'processing';
+        return <Tag color={color}>{text}</Tag>;
+      },
+    },
+    {
+      title: 'Trạng thái đặt hàng',
+      dataIndex: 'orderStatus',
+      key: 'orderStatus',
+      render: (text) => {
+        // Thay đổi màu sắc hoặc kiểu cho trạng thái đặt hàng
+        let color = 'warning';
+        if (text === 'Đã huỷ') color = 'error';
+        if (text === 'Đã nhận') color = 'success';
+        if (text === 'Đang xử lý') color = 'processing';
+        return <Tag color={color}>{text}</Tag>;
+      },
+    },
+    {
+      title: 'Tổng',
+      dataIndex: 'total',
+      key: 'total',
     },
   ];
 
@@ -170,7 +190,7 @@ const OrderPage = () => {
             <ButtonAction onClick={handleDeleteRow} />
           </Space>
         </Row>
-        <TableCustom columns={columnTopProducts} dataSource={dataTopProducts} />
+        <TableCustom columns={columnTopProducts} dataSource={dataOrders} />
       </SpaceCustom>
       <PopupConfirm
         isOpen={isOpenModal}
