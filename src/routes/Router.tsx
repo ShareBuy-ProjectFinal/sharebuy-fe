@@ -21,6 +21,8 @@ import {
 } from 'pages';
 import ForgotPasswordPage from 'pages/Auth/ForgotPassword/ForgotPasswordPage';
 import RevenueDashboardPage from 'pages/Dashboard/RevenueDashboardPage';
+import AddProductPage from 'pages/Product/AddProductPage';
+import CategoryDetailPage from 'pages/Category/CategoryDetailPage';
 
 export const Router = () => {
   const routers: RouteObject[] = [
@@ -45,12 +47,20 @@ export const Router = () => {
           element: <ProdcutPage />,
         },
         {
+          path: PATH.addProduct,
+          element: <AddProductPage />,
+        },
+        {
           path: PATH.order,
           element: <OrderPage />,
         },
         {
           path: PATH.category,
           element: <CategoryPage />,
+        },
+        {
+          path: PATH.categoryDetail,
+          element: <CategoryDetailPage />,
         },
         {
           path: PATH.customer,
@@ -101,7 +111,7 @@ export const Router = () => {
     { path: PATH.login, element: <Login /> },
     { path: PATH.register, element: <RegisterPage /> },
     { path: PATH.forgotPassword, element: <ForgotPasswordPage /> },
-    { path: PATH.all, element: <Navigate to={`${PATH.login}`} /> },
+    // { path: PATH.all, element: <Navigate to={`${PATH.login}`} /> },
   ];
   const router = createBrowserRouter(routers);
   return <RouterProvider router={router} />;

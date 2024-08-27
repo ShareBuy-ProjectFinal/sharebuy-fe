@@ -16,6 +16,7 @@ import { Background } from 'assets/images';
 import { AppleIcon, Facebook, GoogleIcon, LogoAuth } from 'assets/svgs';
 import ButtonCustom from 'components/Button/ButtonCustom';
 import FloatInput from 'components/Input/FloatInput';
+import LoginOrther from 'components/Login/LoginOrther';
 import { auth, providerGoogle } from 'configs/firebaseConfig';
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import React, { useCallback, useState } from 'react';
@@ -27,18 +28,6 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [form] = useForm();
   const [isErrorFirstName, setIsErrorFirstName] = useState(false);
-
-  const { mutate: mutateLoginGoogle, isPending: isPendingLoginGoogle } =
-    useMutation({
-      mutationFn: () => signInWithPopup(auth, providerGoogle),
-      onSuccess: (result: any) => {
-        console.log('result', result);
-        navigate('/');
-      },
-      onError: (error: any) => {
-        console.log('Login error: ', error);
-      },
-    });
 
   const mutateRegister = useMutation({
     mutationFn: () =>
@@ -249,23 +238,7 @@ const RegisterPage = () => {
               </Divider>
             </Flex>
 
-            <Flex justify="space-between" align="center">
-              <ButtonCustom
-                icon={<Facebook />}
-                onClick={() => mutateLoginGoogle()}
-                htmlType="button"
-              />
-              <ButtonCustom
-                icon={<GoogleIcon />}
-                onClick={() => mutateLoginGoogle()}
-                htmlType="button"
-              />
-              <ButtonCustom
-                icon={<AppleIcon />}
-                onClick={() => mutateLoginGoogle()}
-                htmlType="button"
-              />
-            </Flex>
+            <LoginOrther />
           </Form>
         </Flex>
         <div

@@ -7,7 +7,7 @@ interface IProps {
 }
 const LableCustom = ({ value, className }: IProps) => {
   return (
-    <Typography.Text className={`text-lg font-bold ${className}`}>
+    <Typography.Text className={`text-lg font-bold ${className} mb-5`}>
       {value}
     </Typography.Text>
   );

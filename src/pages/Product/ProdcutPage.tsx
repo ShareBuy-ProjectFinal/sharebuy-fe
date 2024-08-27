@@ -24,6 +24,8 @@ import TextCustom from 'components/Text/TextCustom';
 import { dataTopProducts } from 'mocks/Dashboard/data';
 import { dataProducts } from 'mocks/Product/data';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { PATH } from 'routes/Path';
 import { toastSucess } from 'utils/toats';
 
 const optionsFilter = [
@@ -33,6 +35,7 @@ const optionsFilter = [
 ];
 
 const ProdcutPage = () => {
+  const navigate = useNavigate();
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [valueSearch, setValueSearch] = useState<string>('');
   const valueSearchDebounce = useDebounce(valueSearch, 500);
@@ -134,7 +137,7 @@ const ProdcutPage = () => {
   };
 
   const handleAddOrder = () => {
-    toastSucess('Thêm đơn hàng thành công');
+    navigate(PATH.addProduct);
   };
 
   const handleEditRow = () => {

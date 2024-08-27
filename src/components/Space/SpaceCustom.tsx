@@ -1,15 +1,23 @@
 import { Space, SpaceProps } from 'antd';
-import React from 'react';
+import React, { forwardRef } from 'react';
 
-const SpaceCustom: React.FC<SpaceProps> = (props) => {
+interface IProps extends SpaceProps {
+  classNameCustom?: string;
+  width?: string;
+}
+
+const SpaceCustom = forwardRef((props: IProps, ref?: any) => {
+  const { width, className, ...order } = props;
   return (
     <Space
-      className={`${props.className || 'bg-white p-5 w-full rounded-lg shadow-md'}`}
-      {...props}
+      className={`${props.classNameCustom || `bg-white p-5 w-full rounded-lg shadow-md ${className}`}`}
+      {...order}
+      {...(width && { style: { width: width } })}
+      ref={ref}
     >
       {props.children}
     </Space>
   );
-};
+});
 
 export default SpaceCustom;

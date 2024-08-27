@@ -25,14 +25,19 @@ import {
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
+import {
+  arraysEqual,
+  findAllIndices,
+  removeElementsByIndices,
+} from 'utils/constants';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const selectedKeys = [
   [PATH.dashboard, PATH.revenueDashboard, PATH.home],
   [PATH.order],
-  [PATH.product],
-  [PATH.category],
+  [PATH.product, PATH.addProduct],
+  [PATH.category, PATH.categoryDetail],
   [PATH.customer],
   [PATH.report],
   [PATH.salesdeal],
@@ -66,10 +71,22 @@ export const Sidebar = () => {
   };
 
   const getSelectedKey = (pathname: string) => {
-    for (const keys of selectedKeys)
+    for (const keys of selectedKeys) {
       if (keys.includes(pathname)) {
         return keys;
       }
+      for (const key of keys) {
+        if (key.includes(':id')) {
+          let resultkey = key.split('/');
+          let resultPath = pathname.split('/');
+          const indexs = findAllIndices(resultkey, ':id');
+
+          resultkey = removeElementsByIndices(resultkey, indexs);
+          resultPath = removeElementsByIndices(resultPath, indexs);
+          if (arraysEqual(resultkey, resultPath)) return keys;
+        }
+      }
+    }
     return [pathname];
   };
 

@@ -30,35 +30,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { PATH } from 'routes/Path';
 import { toastError } from 'utils/toats';
+import LoginOrther from 'components/Login/LoginOrther';
 
 const Login = () => {
   const navigate = useNavigate();
   const [form] = useForm();
   const [value, setValue] = useState('');
-
-  const { mutate: mutateLoginGoogle, isPending: isPendingLoginGoogle } =
-    useMutation({
-      mutationFn: () => signInWithPopup(auth, providerGoogle),
-      onSuccess: (result: any) => {
-        console.log('result', result);
-        navigate('/');
-      },
-      onError: (error: any) => {
-        console.log('Login error: ', error);
-      },
-    });
-
-  const { mutate: mutateLoginFaceBook, isPending: isPendingLoginFaceBook } =
-    useMutation({
-      mutationFn: () => signInWithPopup(auth, providerFacebook),
-      onSuccess: (result: any) => {
-        console.log('result', result);
-        navigate('/');
-      },
-      onError: (error: any) => {
-        console.log('Login error: ', error);
-      },
-    });
 
   const mutateLogin = useMutation({
     mutationFn: () =>
@@ -195,23 +172,27 @@ const Login = () => {
                 Hoặc đăng nhập với
               </Divider>
             </Flex>
-            <Flex justify="space-between" align="center">
+            {/* <Flex justify="space-between" align="center">
               <ButtonCustom
                 icon={<Facebook />}
                 onClick={() => mutateLoginFaceBook()}
                 htmlType="button"
+                size="large"
               />
               <ButtonCustom
                 icon={<GoogleIcon />}
                 onClick={() => mutateLoginGoogle()}
                 htmlType="button"
+                size="large"
               />
               <ButtonCustom
                 icon={<AppleIcon />}
                 onClick={() => mutateLoginGoogle()}
                 htmlType="button"
+                size="large"
               />
-            </Flex>
+            </Flex> */}
+            <LoginOrther />
           </Form>
         </Flex>
         <div
