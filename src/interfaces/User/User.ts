@@ -1,20 +1,20 @@
 export interface IBaseUser {
   id: string;
-  fullName: string;
-  avatar: string;
+  state: string;
+  full_name: string;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUser extends IBaseUser {
-  phoneNumber: null;
-  role: string;
+  user_name: string;
+  firebase_id: string;
+  phone_number: null;
   email: string;
+  role: string;
+  shop_id: string;
+
   latitude: string;
   longitude: string;
-  isWorking: boolean;
-  sloc: string;
-  departmentName: string;
-  departmentCode: null;
-  plantCode: string;
-  companyId: string;
-  companyName: string;
 }

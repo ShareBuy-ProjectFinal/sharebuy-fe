@@ -12,6 +12,7 @@ import {
   Typography,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
+import AuthApi from 'apis/AuthApis';
 import { Background } from 'assets/images';
 import { AppleIcon, Facebook, GoogleIcon, LogoAuth } from 'assets/svgs';
 import ButtonCustom from 'components/Button/ButtonCustom';
@@ -29,6 +30,17 @@ const RegisterPage = () => {
   const [form] = useForm();
   const [isErrorFirstName, setIsErrorFirstName] = useState(false);
 
+  const mutateUpdateById = useMutation({
+    mutationFn: AuthApi.updateById,
+    onSuccess: (result: any) => {
+      console.log('result', result);
+      // navigate('/');
+    },
+    onError: (error: any) => {
+      console.log('error', error);
+    },
+  });
+
   const mutateRegister = useMutation({
     mutationFn: () =>
       createUserWithEmailAndPassword(
@@ -38,8 +50,7 @@ const RegisterPage = () => {
       ),
     onSuccess: (result: any) => {
       console.log('result', result);
-      // api_updateInfoUser
-      navigate('/');
+      // mutateUpdateById.mutate({ id: 1, value: '2' });
     },
     onError: (error: any) => {
       console.log('Register error: ', error);
@@ -49,7 +60,15 @@ const RegisterPage = () => {
 
   const onFinish = (values: any) => {
     console.log('Success:', values);
-    mutateRegister.mutate();
+    // mutateRegister.mutate();
+    // mutateUpdateById.mutate({ id: 1, value: '2' });
+    mutateUpdateById.mutate({
+      id: 'aid',
+      body: {
+        user_name: values.firstName + ' ' + values.lastName,
+        phone_number: values.phone_number,
+      },
+    });
   };
 
   const getFieldError = (name: any) => {
@@ -133,7 +152,7 @@ const RegisterPage = () => {
               </Col>
               <Col span={12}>
                 <Form.Item
-                  name="phone"
+                  name="phone_number"
                   className="mb-8"
                   rules={[
                     { required: true, message: 'Vui lòng nhập số điện thoại' },
@@ -146,7 +165,7 @@ const RegisterPage = () => {
                   <FloatInput
                     label="Số điện thoại"
                     placeholder="Nhập số điện thoại"
-                    name="phone"
+                    name="phone_number"
                     getFieldError={getFieldError}
                   />
                 </Form.Item>

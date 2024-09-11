@@ -7,12 +7,12 @@ interface IProps extends SpaceProps {
 }
 
 const SpaceCustom = forwardRef((props: IProps, ref?: any) => {
-  const { width, className, ...order } = props;
+  const { width, className, style, ...order } = props;
   return (
     <Space
       className={`${props.classNameCustom || `bg-white p-5 w-full rounded-lg shadow-md ${className}`}`}
       {...order}
-      {...(width && { style: { width: width } })}
+      {...(width && { style: { width: width, ...style } })}
       ref={ref}
     >
       {props.children}

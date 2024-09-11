@@ -13,8 +13,8 @@ const ButtonAdd = forwardRef<HTMLButtonElement | HTMLAnchorElement, IProps>(
       : 'bg-white px-10 py-5 text-[#1e5eff] text-lg hover:!text-white hover:!bg-[#1e5eff]';
     return (
       <Button
-        className={props.classCustom || `${className} ${props.className} `}
         {...props}
+        className={props.classCustom || `${className} ${props.className} `}
         ref={ref}
       >
         <AddIcon />

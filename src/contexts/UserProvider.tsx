@@ -13,7 +13,7 @@ import {
 } from 'react';
 
 type UserContextValues = {
-  user?: IUser;
+  user: IUser;
   isLoading: boolean;
   getUser: () => void;
   signOut: () => void;

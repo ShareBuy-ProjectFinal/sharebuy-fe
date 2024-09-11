@@ -17,11 +17,11 @@ const ButtonAction = memo(
         : 'bg-white px-10 py-5 text-[#1e5eff] text-lg hover:!text-white hover:!bg-[#1e5eff]';
       return (
         <Button
+          {...props}
           className={
             props.classCustom ||
             `bg-white px-1 py-2 text-[#1e5eff] text-lg hover:!text-white hover:!bg-[#1e5eff] ${props.className} `
           }
-          {...props}
           ref={ref}
         >
           {isIcon ? edit ? <EditIcon /> : <DeleteIcon /> : null}

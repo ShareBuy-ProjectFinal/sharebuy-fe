@@ -23,6 +23,7 @@ import ForgotPasswordPage from 'pages/Auth/ForgotPassword/ForgotPasswordPage';
 import RevenueDashboardPage from 'pages/Dashboard/RevenueDashboardPage';
 import AddProductPage from 'pages/Product/AddProductPage';
 import CategoryDetailPage from 'pages/Category/CategoryDetailPage';
+import ProductDetail from 'pages/Product/ProductDetail';
 
 export const Router = () => {
   const routers: RouteObject[] = [
@@ -49,6 +50,10 @@ export const Router = () => {
         {
           path: PATH.addProduct,
           element: <AddProductPage />,
+        },
+        {
+          path: PATH.productDetail,
+          element: <ProductDetail />,
         },
         {
           path: PATH.order,

@@ -101,8 +101,11 @@ module.exports = {
         button: '0px 4px 15px rgba(7, 42, 66, 0.2)',
       },
       boxShadow: {
-        left: '-10px 0 15px -3px rgba(0, 0, 0, 0.1)',
-        right: '5px 0 10px -3px rgba(0, 0, 0, 0.1)',
+        'left': '-10px 0 15px -3px rgba(0, 0, 0, 0.1)',
+        'right':
+          '4px 0 6px -1px rgba(0, 0, 0, 0.1), 4px 0 4px -1px rgba(0, 0, 0, 0.06)',
+        'left-right-md': '-10px 0 50px -3px rgba(0, 0, 0, 0.1)',
+        // , 5px 0 10px -3px rgba(0, 0, 0, 0.1)
       },
       borderRadius: {
         '2.5xl': '1.25rem',

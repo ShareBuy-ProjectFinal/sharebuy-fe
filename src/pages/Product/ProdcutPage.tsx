@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
 import {
   Checkbox,
@@ -13,6 +14,7 @@ import {
   Typography,
 } from 'antd';
 import { ColumnType } from 'antd/es/table';
+import ProductApis from 'apis/ProductApis';
 import { Search } from 'assets/svgs';
 import ButtonAction from 'components/Button/ButtonAction';
 import ButtonAdd from 'components/Button/ButtonAdd';
@@ -21,6 +23,8 @@ import PopupConfirm from 'components/Popup/PopupConfirm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
 import TextCustom from 'components/Text/TextCustom';
+import { auth } from 'configs/firebaseConfig';
+import { useUser } from 'contexts/UserProvider';
 import { dataTopProducts } from 'mocks/Dashboard/data';
 import { dataProducts } from 'mocks/Product/data';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -36,6 +40,7 @@ const optionsFilter = [
 
 const ProdcutPage = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [valueSearch, setValueSearch] = useState<string>('');
   const valueSearchDebounce = useDebounce(valueSearch, 500);
@@ -103,8 +108,19 @@ const ProdcutPage = () => {
     },
   ];
 
+  const mutateProductByShopId = useMutation({
+    mutationFn: ProductApis.getByShopId,
+    onSuccess: (data) => {
+      console.log('data', data);
+    },
+    onError: (error) => {
+      console.log('error', error);
+    },
+  });
+
   useEffect(() => {
     valueSearchDebounce && toastSucess('Tìm kiếm: ' + valueSearchDebounce);
+    mutateProductByShopId.mutate({ id: user?.shop_id }); //check
   }, [valueSearchDebounce]);
 
   function handleCheckAll(e: any) {
@@ -195,7 +211,19 @@ const ProdcutPage = () => {
             <ButtonAction onClick={handleDeleteRow} />
           </Space>
         </Row>
-        <TableCustom columns={columnTopProducts} dataSource={dataProducts} />
+        <TableCustom
+          columns={columnTopProducts}
+          dataSource={mutateProductByShopId?.data?.data || dataProducts}
+          rowClassName={'cursor-pointer'}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                navigate(PATH.productDetailById(record._id || record.key)); //
+              },
+            };
+          }}
+          // className="cursor-pointer"
+        />
       </SpaceCustom>
       <PopupConfirm
         isOpen={isOpenModal}
