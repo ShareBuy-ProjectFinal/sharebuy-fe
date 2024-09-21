@@ -37,7 +37,7 @@ const ButtonCustom = (props: IProps) => {
   if (size === 'large') classNameSize = 'px-12 py-3';
 
   const classNameFill = fill
-    ? 'text-white bg-[#515DEF] hover:text-[#515DEF] hover:bg-white'
+    ? 'text-white bg-[#515DEFef] hover:text-white hover:bg-[#515DEF]'
     : 'text-[#515DEF] bg-white  hover:text-white hover:bg-[#515DEF]';
 
   return (

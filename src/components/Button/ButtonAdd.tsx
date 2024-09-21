@@ -9,12 +9,12 @@ interface IProps extends ButtonProps {
 const ButtonAdd = forwardRef<HTMLButtonElement | HTMLAnchorElement, IProps>(
   ({ children, fill = false, ...props }, ref) => {
     const className = fill
-      ? 'bg-[#1e5eff] px-10 py-5 text-white text-lg hover:!text-[#1e5eff] hover:!bg-white'
+      ? 'bg-[#1e5effea] px-10 py-5 text-white text-lg hover:!text-white hover:!bg-[#1e5eff]'
       : 'bg-white px-10 py-5 text-[#1e5eff] text-lg hover:!text-white hover:!bg-[#1e5eff]';
     return (
       <Button
         {...props}
-        className={props.classCustom || `${className} ${props.className} `}
+        className={props.classCustom || `${className} ${props.className}`}
         ref={ref}
       >
         <AddIcon />

@@ -13,6 +13,7 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(async (config) => {
   const token = await auth.currentUser?.getIdToken();
   if (token) {
+    localStorage.setItem('token', token);
     (config as any).headers.Authorization = token ? `Bearer ${token}` : '';
   }
   return config;

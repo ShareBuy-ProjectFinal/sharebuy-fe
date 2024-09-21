@@ -65,13 +65,14 @@ const CategoryPage = () => {
               style={{ position: 'relative' }}
               key={index}
             >
-              <ButtonCustom
+              {/* <ButtonCustom
                 className="absolute top-1/2 right-3 z-50"
-                value="Thêm"
-                // icon={<AddBoxIcon />}
+                // value="Thêm"
+                icon={<AddBoxIcon />}
                 size="middle"
                 fill
-              />
+              /> */}
+              <AddBoxIcon className="absolute top-1/2 right-3 z-50 hover:bg-[#ffffffec] rounded-3xl" />
               <LableCustom value={category.name} />
               <Divider className="m-0 mb-0 border" />
               <Space className=" mt-0 mb-3  overflow-x-auto whitespace-nowrap w-full min-w-full hide-scrollbar">
