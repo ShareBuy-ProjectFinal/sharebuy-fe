@@ -30,17 +30,6 @@ const RegisterPage = () => {
   const [form] = useForm();
   const [isErrorFirstName, setIsErrorFirstName] = useState(false);
 
-  const mutateUpdateById = useMutation({
-    mutationFn: AuthApi.updateById,
-    onSuccess: (result: any) => {
-      console.log('result', result);
-      // navigate('/');
-    },
-    onError: (error: any) => {
-      console.log('error', error);
-    },
-  });
-
   const mutateRegister = useMutation({
     mutationFn: () =>
       createUserWithEmailAndPassword(
@@ -50,7 +39,14 @@ const RegisterPage = () => {
       ),
     onSuccess: (result: any) => {
       console.log('result', result);
-      // mutateUpdateById.mutate({ id: 1, value: '2' });
+      const values = form.getFieldsValue();
+      createUser({
+        user_name: `${values.firstName} ${values.lastName}`,
+        full_name: `${values.firstName} ${values.lastName}`,
+        email: values.email,
+        phone_number: values.phone_number,
+        role: 'SHOP',
+      });
     },
     onError: (error: any) => {
       console.log('Register error: ', error);
@@ -58,17 +54,20 @@ const RegisterPage = () => {
     },
   });
 
+  const { mutate: createUser } = useMutation({
+    mutationFn: AuthApi.createUser,
+    onSuccess: (response) => {
+      auth.signOut();
+      window.location.href = '/login';
+    },
+    onError: (error) => {
+      console.log('error createUser', error);
+    },
+  });
+
   const onFinish = (values: any) => {
-    console.log('Success:', values);
-    // mutateRegister.mutate();
-    // mutateUpdateById.mutate({ id: 1, value: '2' });
-    mutateUpdateById.mutate({
-      id: 'aid',
-      body: {
-        user_name: values.firstName + ' ' + values.lastName,
-        phone_number: values.phone_number,
-      },
-    });
+    // console.log('Success:', values);
+    mutateRegister.mutate();
   };
 
   const getFieldError = (name: any) => {
@@ -177,7 +176,8 @@ const RegisterPage = () => {
               rules={[
                 { required: true, message: 'Vui lòng nhập mật khẩu' },
                 {
-                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                  pattern:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
                   message:
                     'Có 8 kí tự, ít nhất 1 chữ hoa, 1 chữ thường và 1 số',
                 },

@@ -3,6 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { Spin } from 'antd';
 import AuthApi from 'apis/AuthApis';
+import { auth } from 'configs/firebaseConfig';
 import { IUser } from 'interfaces/User/User';
 import {
   createContext,
@@ -11,6 +12,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { PATH } from 'routes/Path';
 
 type UserContextValues = {
   user: IUser;
@@ -24,22 +26,48 @@ const useUser = (): UserContextValues => useContext(UserContext);
 
 const UserProvider = ({ children }: { children: ReactNode }): JSX.Element => {
   const [user, setUser] = useState<any>();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const currentUser = auth.currentUser;
 
   const handleRemoveToken = () => {
     localStorage.removeItem('token');
-    // window.location.replace(getSignoutUri());
+    setIsLoading(false);
+    auth.signOut();
+    window.location.href = PATH.login;
   };
 
   const { mutate: getUser } = useMutation({
     mutationFn: AuthApi.getMe,
     onSuccess: (response) => {
+      if (response?._id) {
+        setUser(response);
+        setIsLoading(false);
+      } else {
+        createUser({
+          user_name: currentUser?.displayName,
+          full_name: currentUser?.displayName,
+          email: currentUser?.email,
+          phone_number: currentUser?.phoneNumber,
+          role: 'SHOP',
+          image: currentUser?.photoURL,
+        });
+      }
+    },
+    onError: (error) => {
+      console.log('error getMe', error);
+      handleRemoveToken();
+    },
+  });
+
+  const { mutate: createUser } = useMutation({
+    mutationFn: AuthApi.createUser,
+    onSuccess: (response) => {
+      getUser();
       setIsLoading(false);
     },
     onError: (error) => {
-      console.log('error', error);
+      console.log('error createUser', error);
       handleRemoveToken();
-      setIsLoading(false);
     },
   });
 
@@ -48,7 +76,11 @@ const UserProvider = ({ children }: { children: ReactNode }): JSX.Element => {
       setIsLoading(false);
       return;
     }
-    getUser();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      getUser();
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const signOut = () => {

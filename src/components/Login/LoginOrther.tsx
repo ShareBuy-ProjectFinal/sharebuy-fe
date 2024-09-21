@@ -8,14 +8,13 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const LoginOrther = () => {
-  const navigate = useNavigate();
-
   const { mutate: mutateLoginGoogle, isPending: isPendingLoginGoogle } =
     useMutation({
       mutationFn: () => signInWithPopup(auth, providerGoogle),
       onSuccess: (result: any) => {
-        console.log('result', result);
-        navigate('/');
+        // console.log('result', result.user);
+        localStorage.setItem('token', result.user.accessToken);
+        window.location.href = '/';
       },
       onError: (error: any) => {
         console.log('Login error: ', error);
@@ -26,8 +25,9 @@ const LoginOrther = () => {
     useMutation({
       mutationFn: () => signInWithPopup(auth, providerFacebook),
       onSuccess: (result: any) => {
-        console.log('result', result);
-        navigate('/');
+        // console.log('result', result);
+        localStorage.setItem('token', result.user.accessToken);
+        window.location.href = '/';
       },
       onError: (error: any) => {
         console.log('Login error: ', error);

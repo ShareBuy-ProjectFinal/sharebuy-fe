@@ -11,11 +11,13 @@ const AuthApi = {
   // },
 
   getMe: async (): Promise<any> => {
-    return await axiosClient.get(`${path}/${auth.currentUser?.uid}`);
+    return await axiosClient.get(`${path}/firebase/${auth.currentUser?.uid}`);
   },
-  //-------------------//
   updateById: async (params: { id: any; body: any }): Promise<any> => {
     return await axiosClient.put(`${path}/${params.id}`, params.body);
+  },
+  createUser: async (params: any): Promise<any> => {
+    return await axiosClient.post(`${path}`, params);
   },
 };
 

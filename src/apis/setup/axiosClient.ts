@@ -10,8 +10,8 @@ const axiosClient = axios.create({
     queryString.stringify(params, { arrayFormat: 'bracket' }),
 });
 
-axiosClient.interceptors.request.use((config) => {
-  const token = auth.currentUser?.getIdToken();
+axiosClient.interceptors.request.use(async (config) => {
+  const token = await auth.currentUser?.getIdToken();
   if (token) {
     (config as any).headers.Authorization = token ? `Bearer ${token}` : '';
   }

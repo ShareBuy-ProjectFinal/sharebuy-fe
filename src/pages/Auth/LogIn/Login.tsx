@@ -45,8 +45,9 @@ const Login = () => {
         form.getFieldValue('password'),
       ),
     onSuccess: (result: any) => {
-      console.log('result', result);
-      navigate('/');
+      localStorage.setItem('token', result.user.accessToken);
+      // console.log('result', result);
+      window.location.href = '/';
     },
     onError: (error: any) => {
       console.log('Login error: ', error);
@@ -54,15 +55,9 @@ const Login = () => {
     },
   });
 
-  useEffect(() => {
-    // setValue(localStorage.getItem('email') || '');
-    // console.log('auth', auth);
-  }, []);
-
   const onFinish = (values: any) => {
-    console.log('Success:', values);
+    // console.log('Success:', values);
     mutateLogin.mutate();
-    // navigate('/');
   };
 
   const getFieldError = (name: any) => {
@@ -111,7 +106,8 @@ const Login = () => {
               rules={[
                 { required: true, message: 'Vui lòng nhập mật khẩu' },
                 {
-                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/,
+                  pattern:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
                   message:
                     'Có 8 kí tự, ít nhất 1 chữ hoa, 1 chữ thường và 1 số',
                 },
@@ -172,26 +168,6 @@ const Login = () => {
                 Hoặc đăng nhập với
               </Divider>
             </Flex>
-            {/* <Flex justify="space-between" align="center">
-              <ButtonCustom
-                icon={<Facebook />}
-                onClick={() => mutateLoginFaceBook()}
-                htmlType="button"
-                size="large"
-              />
-              <ButtonCustom
-                icon={<GoogleIcon />}
-                onClick={() => mutateLoginGoogle()}
-                htmlType="button"
-                size="large"
-              />
-              <ButtonCustom
-                icon={<AppleIcon />}
-                onClick={() => mutateLoginGoogle()}
-                htmlType="button"
-                size="large"
-              />
-            </Flex> */}
             <LoginOrther />
           </Form>
         </Flex>

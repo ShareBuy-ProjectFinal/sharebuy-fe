@@ -26,6 +26,7 @@ import CategoryDetailPage from 'pages/Category/CategoryDetailPage';
 import ProductDetail from 'pages/Product/ProductDetail';
 
 export const Router = () => {
+  const token = localStorage.getItem('token');
   const routers: RouteObject[] = [
     {
       path: PATH.home,
@@ -113,10 +114,14 @@ export const Router = () => {
         },
       ],
     },
-    { path: PATH.login, element: <Login /> },
-    { path: PATH.register, element: <RegisterPage /> },
-    { path: PATH.forgotPassword, element: <ForgotPasswordPage /> },
-    // { path: PATH.all, element: <Navigate to={`${PATH.login}`} /> },
+    { path: PATH.all, element: <Navigate to={`${PATH.dashboard}`} /> },
+    ...(token
+      ? []
+      : [
+          { path: PATH.login, element: <Login /> },
+          { path: PATH.register, element: <RegisterPage /> },
+          { path: PATH.forgotPassword, element: <ForgotPasswordPage /> },
+        ]),
   ];
   const router = createBrowserRouter(routers);
   return <RouterProvider router={router} />;
