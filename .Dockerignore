@@ -1,0 +1,31 @@
+# Ignore node_modules because dependencies will be installed in the Docker container
+node_modules
+
+# Ignore any local environment files
+
+
+# Ignore build or static folder (STC) if it contains compiled or unnecessary assets
+STC
+
+# Ignore Dockerignore itself, Dockerfile, and configuration files that are not needed in the container
+.dockerignore
+Dockerfile
+
+# Ignore version control and configuration files
+.git
+.github
+.gitignore
+.node-version
+.nvmrc
+
+# Ignore linting and formatting configurations that are only needed during development
+.eslintignore
+.eslintrc.json
+.prettierrc
+
+# Ignore other development-related configuration files
+render.yaml
+settings.json
+static.json
+tailwind.config.js
+tsconfig.json
