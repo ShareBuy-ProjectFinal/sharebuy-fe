@@ -18,29 +18,10 @@ spec:
         - name: sharebuy-fe
           image: khanh2608/sharebuy-fe # Thay thế bằng tên và tag image của bạn
           ports:
-            - containerPort: 3000  # Cổng mà ứng dụng React chạy (mặc định là 3000)
+            - containerPort: 80  # Cổng mà ứng dụng React chạy (mặc định là 3000)
           env:
             - name: NODE_ENV
               value: "production"  # Thiết lập môi trường production cho React
-          # resources:
-          #   limits:
-          #     memory: "512Mi"
-          #     cpu: "500m"
-          #   requests:
-          #     memory: "256Mi"
-          #     cpu: "250m"
-          # livenessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   httpGet:
-          #     path: /
-          #     port: 3000
-          #   initialDelaySeconds: 30
-          #   periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
@@ -53,6 +34,6 @@ spec:
     app: sharebuy-fe  # Kết nối với các Pod có nhãn app: sharebuy-fe
   ports:
     - port: 3000  # Cổng của service
-      targetPort: 3000  # Cổng container mà service sẽ forward
+      targetPort: 80  # Cổng container mà service sẽ forward
       protocol: TCP
   type: ClusterIP

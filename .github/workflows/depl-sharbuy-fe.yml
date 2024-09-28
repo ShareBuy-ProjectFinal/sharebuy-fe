@@ -29,4 +29,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
     - name: Apply Kubernetes manifests
-      run: kubectl apply -f k8s/sharebuy-fe-depl.yaml
+      run: |
+        kubectl apply -f k8s/sharebuy-fe-depl.yaml
+        kubectl rollout restart deployment sharebuy-fe-deployment
