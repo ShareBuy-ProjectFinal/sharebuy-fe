@@ -10,7 +10,8 @@ STC
 # Ignore Dockerignore itself, Dockerfile, and configuration files that are not needed in the container
 .dockerignore
 Dockerfile
-
+build
+k8s
 # Ignore version control and configuration files
 .git
 .github
