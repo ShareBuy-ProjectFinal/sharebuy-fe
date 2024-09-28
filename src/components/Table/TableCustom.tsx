@@ -1,6 +1,7 @@
 import { Table, TableProps } from 'antd';
 import type { Reference } from 'rc-table';
-import React from 'react';
+import React, { memo } from 'react';
+import { generateUUID } from 'utils/function';
 
 const TableCustom = (
   props: React.PropsWithChildren<TableProps> & React.RefAttributes<Reference>,
@@ -18,7 +19,9 @@ const TableCustom = (
   });
   return (
     <Table
-      // rowKey={(record) => record.id}
+      rowKey={(record) =>
+        record._id || record.id || record.key || generateUUID()
+      }
       scroll={{ x: 175 }}
       size="middle"
       {...props}
@@ -40,4 +43,4 @@ const TableCustom = (
   );
 };
 
-export default TableCustom;
+export default memo(TableCustom);

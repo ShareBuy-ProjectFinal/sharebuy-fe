@@ -2,7 +2,7 @@ import { ToastPosition } from 'react-toastify';
 
 export const optionsToast = {
   position: 'top-right' as ToastPosition,
-  autoClose: 2200,
+  autoClose: 3200,
   hideProgressBar: false,
   closeOnClick: true,
   pauseOnHover: false,
@@ -38,3 +38,5 @@ export const removeElementsByIndices = (
 ) => {
   return array.filter((_, index) => !indicesToRemove.includes(index));
 };
+
+export const DEFAULT_PAGE_SIZE = 10;

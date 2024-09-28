@@ -1,5 +1,5 @@
 export interface IBaseUser {
-  id: string;
+  _id: string;
   state: string;
   full_name: string;
   image: string;

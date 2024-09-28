@@ -2,7 +2,7 @@ import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { Dropdown, Flex, Image, MenuProps } from 'antd';
 import { auth } from 'configs/firebaseConfig';
 import { useUser } from 'contexts/UserProvider';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
 
@@ -22,6 +22,7 @@ const Avatar = () => {
       icon: <LogoutOutlined />,
     },
   ];
+
   return (
     <Dropdown
       menu={{ items }}
@@ -36,6 +37,7 @@ const Avatar = () => {
           width={34}
           preview={false}
           src={
+            user?.image ||
             'https://lh3.googleusercontent.com/a/ACg8ocLEj7a2TB9bRl7qQUhE6Nln0jUfn2qzQwDh2yHJKtje5bQZXg=s96-c'
           }
           className="rounded-full border"

@@ -24,7 +24,7 @@ const PopupConfirm = memo((props: Iprops) => {
     handleCancel,
   } = props;
 
-  console.log('PopupConfirm');
+  // console.log('PopupConfirm');
 
   return (
     <Modal

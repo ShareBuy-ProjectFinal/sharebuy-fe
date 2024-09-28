@@ -10,10 +10,10 @@ import { PATH } from 'routes/Path';
 // import { Content } from 'antd/es/layout/layout';
 
 export const MainLayout = () => {
-  const isToken = localStorage.getItem('token');
-  if (!isToken) {
-    return <Navigate to={`${PATH.login}`} />;
-  }
+  // const isToken = localStorage.getItem('token');
+  // if (!isToken) {
+  //   return <Navigate to={`${PATH.login}`} />;
+  // }
   return (
     <Layout className="min-h-screen">
       <MainHeader />
