@@ -39,6 +39,7 @@ const UserProvider = ({ children }: { children: ReactNode }): JSX.Element => {
   const { mutate: getUser } = useMutation({
     mutationFn: AuthApi.getMe,
     onSuccess: (response) => {
+      // console.log('response', response);
       if (response?._id) {
         setUser(response);
         setIsLoading(false);

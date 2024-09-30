@@ -25,11 +25,15 @@ import TableCustom from 'components/Table/TableCustom';
 import TextCustom from 'components/Text/TextCustom';
 import { auth } from 'configs/firebaseConfig';
 import { useUser } from 'contexts/UserProvider';
+import useQueryParam from 'hook/useQueryParam';
 import { dataTopProducts } from 'mocks/Dashboard/data';
 import { dataProducts } from 'mocks/Product/data';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
+import { DEFAULT_PAGE_SIZE } from 'utils/constants';
+import formatNumber from 'utils/function';
+import { HocChangePagination } from 'utils/HocChangePagination';
 import { toastSucess } from 'utils/toats';
 
 const optionsFilter = [
@@ -41,6 +45,12 @@ const optionsFilter = [
 const ProdcutPage = () => {
   const navigate = useNavigate();
   const { user } = useUser();
+
+  const queryParam = useQueryParam();
+  const page = parseInt(queryParam.get('page') + '') || 1;
+  const page_size =
+    parseInt(queryParam.get('page_size') + '') || DEFAULT_PAGE_SIZE;
+
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [valueSearch, setValueSearch] = useState<string>('');
   const valueSearchDebounce = useDebounce(valueSearch, 500);
@@ -51,7 +61,6 @@ const ProdcutPage = () => {
       title: <Checkbox checked={checkall} onChange={handleCheckAll} />,
       width: 35,
       dataIndex: 'checkall',
-      key: 'checkall',
       render: (vale, record) => (
         <Checkbox
           checked={
@@ -63,19 +72,19 @@ const ProdcutPage = () => {
     },
     {
       title: 'Sản phẩm',
-      dataIndex: 'product',
-      key: 'product',
+      dataIndex: 'product_name',
+      // width: 200,
       render: (text, record) => (
         <Space align="center">
           <Image
-            src={record.imageUrl}
+            src={record.image}
             width={40}
             height={45}
             className="rounded-md border-[##bfc1c2] border"
           />
           <Space direction="vertical" size={0}>
-            <TextCustom value={text} />
-            <TextCustom value={record.category} />
+            <TextCustom value={text} color="text-[#131523]" />
+            <TextCustom value={record.category_name} />
           </Space>
         </Space>
       ),
@@ -83,28 +92,25 @@ const ProdcutPage = () => {
     {
       title: 'Tồn kho',
       dataIndex: 'inventory',
-      key: 'inventory',
+      width: 100,
       render: (text) => {
-        if (text.includes('Out of Stock')) {
+        if (text && text.includes('Out of Stock')) {
           return <Tag color="error">Hết hàng</Tag>;
         }
         return text;
       },
     },
     {
-      title: 'Màu sắc',
-      dataIndex: 'color',
-      key: 'color',
-    },
-    {
       title: 'Giá',
+      width: 130,
       dataIndex: 'price',
-      key: 'price',
+      render: (text) => `${formatNumber(text)} VND`,
     },
     {
+      align: 'center',
       title: 'Đánh giá',
-      dataIndex: 'rating',
-      key: 'rating',
+      width: 100,
+      dataIndex: 'average_rating',
     },
   ];
 
@@ -119,9 +125,10 @@ const ProdcutPage = () => {
   });
 
   useEffect(() => {
-    valueSearchDebounce && toastSucess('Tìm kiếm: ' + valueSearchDebounce);
-    mutateProductByShopId.mutate({ id: user?.shop_id }); //check
-  }, [valueSearchDebounce]);
+    if (user) {
+      mutateProductByShopId.mutate({ id: user?._id, page, page_size }); //check
+    }
+  }, [page, page_size, user]);
 
   function handleCheckAll(e: any) {
     if (!e.target.checked) {
@@ -149,7 +156,8 @@ const ProdcutPage = () => {
   }
 
   const handleDownload = () => {
-    toastSucess('Tải thành công');
+    // toastSucess('Tải thành công');
+    console.log('user', user);
   };
 
   const handleAddOrder = () => {
@@ -215,6 +223,12 @@ const ProdcutPage = () => {
           columns={columnTopProducts}
           dataSource={mutateProductByShopId?.data?.data || dataProducts}
           rowClassName={'cursor-pointer'}
+          pagination={{
+            current: page,
+            pageSize: page_size,
+            total: mutateProductByShopId?.data?.pagination.totalProducts || 0,
+            onChange: HocChangePagination(),
+          }}
           onRow={(record) => {
             return {
               onClick: () => {

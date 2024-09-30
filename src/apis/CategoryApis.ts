@@ -5,6 +5,10 @@ const CategoryApis = {
   getAll: async () => {
     return await axiosClient.get(`${path}`);
   },
+
+  getById: async (id: string) => {
+    return await axiosClient.get(`${path}/${id}`);
+  },
 };
 
 export default CategoryApis;

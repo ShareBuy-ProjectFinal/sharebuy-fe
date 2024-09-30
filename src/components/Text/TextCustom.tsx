@@ -3,9 +3,15 @@ import React from 'react';
 
 interface IProps {
   value: any;
+  color?: string;
+  className?: string;
 }
-const TextCustom = ({ value }: IProps) => {
-  return <Typography.Text className="text-[#5A607F]">{value}</Typography.Text>;
+const TextCustom = ({ value, color = 'text-[#5A607F]', className }: IProps) => {
+  return (
+    <Typography.Text className={`${color} ${className}`}>
+      {value}
+    </Typography.Text>
+  );
 };
 
 export default TextCustom;
