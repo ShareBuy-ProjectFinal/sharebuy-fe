@@ -210,7 +210,7 @@ const AddProductPage = () => {
   const mutateAddProduct = useMutation({
     mutationFn: ProductApis.createProduct,
     onSuccess: (data: any) => {
-      console.log('data', data);
+      // console.log('data', data);
       dataProDetails.forEach((item: any) => {
         mutateAddProductDetail.mutate({
           product_id: data._id as string,
@@ -223,6 +223,7 @@ const AddProductPage = () => {
             item.listAttribute.map((item: any) => item.value) || [],
         });
       });
+      toastSucess('Thêm sản phẩm thành công');
     },
     onError: (error) => {
       console.log('error', error);
