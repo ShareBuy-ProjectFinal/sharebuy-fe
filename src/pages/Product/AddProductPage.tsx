@@ -197,29 +197,32 @@ const AddProductPage = () => {
     },
   });
 
-  const mutateAddProduct = useMutation({
-    mutationFn: ProductApis.createProduct,
+  const mutateAddProductDetail = useMutation({
+    mutationFn: ProductApis.createProductDetail,
     onSuccess: (data: any) => {
       console.log('data', data);
-      // dataProDetails.map((item: any) => ({
-      //   product_id: '66e9532da46697001266a04b',
-      //   name: 'test',
-      //   price: 1000,
-      //   quantity: 10,
-      //   image: 'https://',
-      //   custom_attribute_values: item.map((item: any) => item.value),
-      // }));
-      // mutateAddProductDetail.mutate(data._id);
     },
     onError: (error) => {
       console.log('error', error);
     },
   });
 
-  const mutateAddProductDetail = useMutation({
-    mutationFn: ProductApis.createProductDetail,
+  const mutateAddProduct = useMutation({
+    mutationFn: ProductApis.createProduct,
     onSuccess: (data: any) => {
       console.log('data', data);
+      dataProDetails.forEach((item: any) => {
+        mutateAddProductDetail.mutate({
+          product_id: data._id as string,
+          name: data.product_name, // Provide appropriate value
+          old_price: item.price, // Provide appropriate value
+          price: item.price, // Provide appropriate value
+          quantity: item.quantity, // Provide appropriate value
+          image: item.image, // Provide appropriate value
+          custom_attribute_values:
+            item.listAttribute.map((item: any) => item.value) || [],
+        });
+      });
     },
     onError: (error) => {
       console.log('error', error);
@@ -269,51 +272,39 @@ const AddProductPage = () => {
   };
 
   const handldFinish = async (values: any) => {
-    // if (backgroundImage.length == 0) {
-    //   toastError('Vui lòng chọn ảnh nền');
-    //   return;
-    // }
-    // if (fileList.length == 0) {
-    //   toastError('Vui lòng chọn ảnh chi tiết');
-    //   return;
-    // }
-    // mutateUploadImage.mutate({
-    //   uploadFiles: backgroundImage,
-    //   isBackGround: true,
-    // });
-    // mutateUploadImage.mutate({ uploadFiles: fileList });
-    // const uploadImage = await Promise.all([
-    //   mutateUploadImage.mutateAsync({
-    //     uploadFiles: backgroundImage,
-    //     isBackGround: true,
-    //   }),
-    //   mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
-    // ]);
+    if (backgroundImage.length == 0) {
+      toastError('Vui lòng chọn ảnh nền');
+      return;
+    }
+    if (fileList.length == 0) {
+      toastError('Vui lòng chọn ảnh chi tiết');
+      return;
+    }
+    const uploadImage = await Promise.all([
+      mutateUploadImage.mutateAsync({
+        uploadFiles: backgroundImage,
+        isBackGround: true,
+      }),
+      mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
+    ]);
     // console.log('uploadImage', uploadImage); //uplaoImage[0] là ảnh nền, uploadImage[1] là ảnh chi tiết
-    // console.log('listAttribute', listAttribute);
-    // if (!isValidateAttribute()) {
-    //   const { category_id, category_value_id, ...params } =
-    //     form.getFieldsValue();
-    //   console.log('values', {
-    //     ...params,
-    //     category_id: category_value_id,
-    //     shop_id: user?._id,
-    //     custom_attributes: listAttribute
-    //       .filter((item) => item.attribute_id)
-    //       .map((item) => item.attribute_id),
-    //   });
-    // }
-    console.log(
-      'data',
-      dataProDetails.map((item: any) => ({
-        product_id: '66e9532da46697001266a04b',
-        name: 'test',
-        price: 1000,
-        quantity: 10,
-        image: item.image || 'https://',
-        custom_attribute_values: item.map((item: any) => item.value),
-      })),
-    );
+
+    if (!isValidateAttribute()) {
+      const { category_id, category_value_id, quantity, ...params } =
+        form.getFieldsValue();
+      mutateAddProduct.mutate({
+        ...params,
+        image: uploadImage[0]?.[0]?.url,
+        images: uploadImage[1].map((item: any) => item.url),
+        category_id: category_value_id,
+        shop_id: user?._id,
+        custom_attributes: listAttribute
+          .filter((item) => item.attribute_id)
+          .map((item) => item.attribute_id),
+      });
+    }
+
+    // console.log('data', dataProDetails);
   };
 
   const onChangeAttribute = (value: any, index: number) => {
@@ -328,7 +319,11 @@ const AddProductPage = () => {
   const onChangeAttributeValue = (value: any, index: number) => {
     listAttribute[index].attributeValue_ids = value;
     setDataProDetails(
-      combine(listAttribute.map((item) => item.attributeValue_ids)),
+      combine(listAttribute.map((item) => item.attributeValue_ids)).map(
+        (item) => ({
+          listAttribute: item,
+        }),
+      ),
     );
     setListAttribute((pre) => {
       const newList = [...pre];
@@ -574,12 +569,12 @@ const AddProductPage = () => {
                   name={'category_id'}
                   label="Phân loại"
                   className="mb-1"
-                  // rules={[
-                  //   {
-                  //     required: true,
-                  //     message: 'Vui lòng chọn một giá trị',
-                  //   },
-                  // ]}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng chọn một giá trị',
+                    },
+                  ]}
                 >
                   <SelectForm
                     size="middle"
@@ -603,12 +598,12 @@ const AddProductPage = () => {
                   name={'category_value_id'}
                   label="Phân loại con"
                   className="mb-1"
-                  // rules={[
-                  //   {
-                  //     required: true,
-                  //     message: 'Vui lòng chọn một giá trị',
-                  //   },
-                  // ]}
+                  rules={[
+                    {
+                      required: true,
+                      message: 'Vui lòng chọn một giá trị',
+                    },
+                  ]}
                 >
                   <SelectForm
                     size="middle"

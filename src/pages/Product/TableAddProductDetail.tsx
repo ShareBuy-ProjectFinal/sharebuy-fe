@@ -61,8 +61,6 @@ const TableAddProductDetail = (props: IProps) => {
           ) : (
             <AddIcon className="text-primary-40 border-2" />
           )}
-
-          {/* <AddIcon className="text-primary-40 border-2" /> */}
         </Upload>
       ),
     },
@@ -71,19 +69,31 @@ const TableAddProductDetail = (props: IProps) => {
       //   width: 50,
       dataIndex: 'listAttribute',
       render: (value, record) =>
-        record.map((item: any) => item.label).join(', '),
+        value.map((item: any) => item.label).join(', '),
     },
     {
       title: 'Giá',
       width: 150,
       dataIndex: 'price',
-      render: () => <Input type="number" />,
+      render: (item, record, index) => (
+        <Input
+          type="number"
+          value={item}
+          onChange={(value) => onChangePrice(value, index)}
+        />
+      ),
     },
     {
       title: 'Số lượng',
       width: 90,
       dataIndex: 'quantity',
-      render: () => <Input type="number" />,
+      render: (item, record, index) => (
+        <Input
+          type="number"
+          value={item}
+          onChange={(value) => onChangeQuantiy(value, index)}
+        />
+      ),
     },
   ];
 
@@ -100,6 +110,16 @@ const TableAddProductDetail = (props: IProps) => {
       data[index].image = url;
       setRefresh(!refresh);
     });
+  };
+
+  const onChangePrice = (value: any, index: any) => {
+    data[index].price = value.target.value;
+    setRefresh(!refresh);
+  };
+
+  const onChangeQuantiy = (value: any, index: any) => {
+    data[index].quantity = value.target.value;
+    setRefresh(!refresh);
   };
 
   return <TableCustom columns={columns} dataSource={data} />;

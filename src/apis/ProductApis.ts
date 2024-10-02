@@ -3,12 +3,13 @@ import axiosClient from './setup/axiosClient';
 import { IProdcutNew, IProductDetail } from 'interfaces/Product/Product';
 
 const path = '/api/products/products';
+const pathDetail = '/api/products/product-details';
 const ProductApis = {
   createProduct: async (data: IProdcutNew): Promise<any> => {
     return await axiosClient.post(`${path}`, data);
   },
   createProductDetail: async (data: IProductDetail): Promise<any> => {
-    return await axiosClient.post(`${path}`, data);
+    return await axiosClient.post(`${pathDetail}`, data);
   },
   getByCategoryID: async (data: {
     id: any;
