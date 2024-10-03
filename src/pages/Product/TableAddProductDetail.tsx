@@ -1,4 +1,4 @@
-import { UploadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   Button,
   GetProp,
@@ -57,7 +57,25 @@ const TableAddProductDetail = (props: IProps) => {
           showUploadList={false}
         >
           {value ? (
-            <img src={value} alt="avatar" />
+            <div style={{ position: 'relative' }}>
+              <img src={value} alt="avatar" />
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<DeleteOutlined />}
+                size="small"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  transform: 'translate(-5%, -5%)',
+                }}
+                onClick={(e) => {
+                  e.stopPropagation(); // Ngăn chặn sự kiện onClick của hình ảnh
+                  handleDeleteImage(index);
+                }}
+              />
+            </div>
           ) : (
             <AddIcon className="text-primary-40 border-2" />
           )}
@@ -78,7 +96,7 @@ const TableAddProductDetail = (props: IProps) => {
       render: (item, record, index) => (
         <Input
           type="number"
-          value={item}
+          defaultValue={item}
           onChange={(value) => onChangePrice(value, index)}
         />
       ),
@@ -90,7 +108,7 @@ const TableAddProductDetail = (props: IProps) => {
       render: (item, record, index) => (
         <Input
           type="number"
-          value={item}
+          defaultValue={item}
           onChange={(value) => onChangeQuantiy(value, index)}
         />
       ),
@@ -105,21 +123,28 @@ const TableAddProductDetail = (props: IProps) => {
 
   const onChangeImageBackground = (info: any, index: number) => {
     const newFileList = { ...info };
-    console.log('newFileList', newFileList);
+    // console.log('newFileList', newFileList);
     getBase64(newFileList.file.originFileObj as FileType, (url) => {
       data[index].image = url;
+      data[index].file = newFileList.file.originFileObj;
       setRefresh(!refresh);
     });
   };
 
+  const handleDeleteImage = (index: number) => {
+    delete data[index].image;
+    delete data[index].file;
+    setRefresh(!refresh);
+  };
+
   const onChangePrice = (value: any, index: any) => {
     data[index].price = value.target.value;
-    setRefresh(!refresh);
+    // setRefresh(!refresh);
   };
 
   const onChangeQuantiy = (value: any, index: any) => {
     data[index].quantity = value.target.value;
-    setRefresh(!refresh);
+    // setRefresh(!refresh);
   };
 
   return <TableCustom columns={columns} dataSource={data} />;

@@ -45,10 +45,15 @@ export const checkFormValidate = async (form: FormInstance<any>) => {
 };
 
 export const combine = (arrays: any[]): any[] => {
+  if (arrays.length === 0) return [];
+  return postCombine(arrays);
+};
+
+const postCombine = (arrays: any[]): any[] => {
   if (arrays.length === 0) return [[]];
   const firstArray = arrays[0];
   const restArrays = arrays.slice(1);
-  const restCombinations = combine(restArrays);
+  const restCombinations = postCombine(restArrays);
   const combinations = [];
 
   for (const value of firstArray) {

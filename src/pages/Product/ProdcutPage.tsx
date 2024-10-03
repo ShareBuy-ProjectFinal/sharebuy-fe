@@ -47,7 +47,7 @@ const ProdcutPage = () => {
   const { user } = useUser();
 
   const queryParam = useQueryParam();
-  const page = parseInt(queryParam.get('page') + '') || 1;
+  const page = parseInt(queryParam.get('page') + '') - 1 || 0;
   const page_size =
     parseInt(queryParam.get('page_size') + '') || DEFAULT_PAGE_SIZE;
 
@@ -91,14 +91,8 @@ const ProdcutPage = () => {
     },
     {
       title: 'Tồn kho',
-      dataIndex: 'inventory',
+      dataIndex: 'quantity',
       width: 100,
-      render: (text) => {
-        if (text && text.includes('Out of Stock')) {
-          return <Tag color="error">Hết hàng</Tag>;
-        }
-        return text;
-      },
     },
     {
       title: 'Giá',
@@ -111,6 +105,7 @@ const ProdcutPage = () => {
       title: 'Đánh giá',
       width: 100,
       dataIndex: 'average_rating',
+      render: (text) => (text ? text.toFixed(2) : 'Chưa có đánh giá'),
     },
   ];
 
@@ -224,7 +219,7 @@ const ProdcutPage = () => {
           dataSource={mutateProductByShopId?.data?.data || dataProducts}
           rowClassName={'cursor-pointer'}
           pagination={{
-            current: page,
+            current: page + 1,
             pageSize: page_size,
             total: mutateProductByShopId?.data?.pagination.totalProducts || 0,
             onChange: HocChangePagination(),
