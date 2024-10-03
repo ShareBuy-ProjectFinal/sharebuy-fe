@@ -37,35 +37,6 @@ import TableAddProductDetail from './TableAddProductDetail';
 import { dataCategoryMen } from 'mocks/Category/data';
 import ProductApis from 'apis/ProductApis';
 
-//áo dài, áo sơ mi, quần đuồi, quần lót
-const optionPhanLoais = [
-  { label: 'Áo dài', value: '0' },
-  { label: 'Áo sơ mi', value: '1' },
-  { label: 'Quần đuồi', value: '2' },
-  { label: 'Quần lót', value: '3' },
-];
-
-const option1 = [
-  { label: '1Adidas', value: 'adidas' },
-  { label: '1Nike', value: 'nike' },
-  { label: '1Puma', value: 'puma' },
-  { label: '1Converse', value: 'converse' },
-];
-
-const option2 = [
-  { label: '2Sắc đẹp', value: 'beauty' },
-  { label: '2Sức khỏe', value: 'health' },
-  { label: '2Thời trang nam', value: 'fashionMen' },
-  { label: '2Thời trang nữ', value: 'fashionWomen' },
-];
-
-const option3 = [
-  { label: '3Sắc đẹp', value: 'beauty' },
-  { label: '3Sức khỏe', value: 'health' },
-  { label: '3Thời trang nam', value: 'fashionMen' },
-  { label: '3Thời trang nữ', value: 'fashionWomen' },
-];
-
 export interface IAttribute {
   optionAttribute: any[];
   attribute_id: any;
@@ -166,6 +137,7 @@ const AddProductPage = () => {
           label: item.name,
         })) || [],
       );
+      form.setFieldsValue({ category_value_id: undefined });
     },
     onError: (error) => {
       console.log('error', error);
@@ -197,6 +169,31 @@ const AddProductPage = () => {
     },
   });
 
+  const mutateUploadImageDetail = useMutation({
+    mutationFn: async (base64s: any[]) => {
+      const promises = base64s.map((item, index) => {
+        if (item?.file) {
+          const formData = new FormData();
+          formData.append('file', item?.file);
+          return UploadApis.uploadImage(formData).then((res: any) => {
+            // console.log('res', res);
+            dataProDetails[index].imageUrl = res?.url;
+            return res;
+          });
+        }
+        return {};
+      });
+      return await Promise.all(promises);
+    },
+    onSuccess: (res: any, variable) => {
+      // console.log('res', res);
+      // if (res?.data) dataProDetails[res.index].image = res.data.url;
+    },
+    onError: (error) => {
+      console.log('error', error);
+    },
+  });
+
   const mutateAddProductDetail = useMutation({
     mutationFn: ProductApis.createProductDetail,
     onSuccess: (data: any) => {
@@ -218,7 +215,7 @@ const AddProductPage = () => {
           old_price: item.price, // Provide appropriate value
           price: item.price, // Provide appropriate value
           quantity: item.quantity, // Provide appropriate value
-          image: item.image, // Provide appropriate value
+          image: item?.imageUrl, // Provide appropriate value
           custom_attribute_values:
             item.listAttribute.map((item: any) => item.value) || [],
         });
@@ -281,16 +278,17 @@ const AddProductPage = () => {
       toastError('Vui lòng chọn ảnh chi tiết');
       return;
     }
-    const uploadImage = await Promise.all([
-      mutateUploadImage.mutateAsync({
-        uploadFiles: backgroundImage,
-        isBackGround: true,
-      }),
-      mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
-    ]);
-    // console.log('uploadImage', uploadImage); //uplaoImage[0] là ảnh nền, uploadImage[1] là ảnh chi tiết
-
+    // // console.log('uploadImage', uploadImage); //uplaoImage[0] là ảnh nền, uploadImage[1] là ảnh chi tiết
     if (!isValidateAttribute()) {
+      const uploadImage = await Promise.all([
+        mutateUploadImage.mutateAsync({
+          uploadFiles: backgroundImage,
+          isBackGround: true,
+        }),
+        mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
+        mutateUploadImageDetail.mutateAsync(dataProDetails),
+      ]);
+      console.log('uploadImage', uploadImage);
       const { category_id, category_value_id, quantity, ...params } =
         form.getFieldsValue();
       mutateAddProduct.mutate({
@@ -304,12 +302,24 @@ const AddProductPage = () => {
           .map((item) => item.attribute_id),
       });
     }
-
-    // console.log('data', dataProDetails);
+    // console.log('data', listAttribute);
+    // console.log('da', dataProDetails);
   };
 
   const onChangeAttribute = (value: any, index: number) => {
     listAttribute[index].attributeValue_ids = [];
+    setDataProDetails(
+      combine(
+        listAttribute
+          .filter(
+            (item) =>
+              item.attributeValue_ids && item.attributeValue_ids?.length > 0,
+          )
+          .map((item) => item.attributeValue_ids),
+      ).map((item) => ({
+        listAttribute: item,
+      })),
+    );
     if (value) {
       mutateAttributeValue.mutate({ attributeId: value, index });
     } else {
@@ -368,8 +378,8 @@ const AddProductPage = () => {
   };
 
   const onChangeImageDetail = (info: any) => {
+    info.file.status = 'done';
     let newFileList = [...info.fileList];
-
     if (newFileList.length > 5) {
       toastError('Chỉ được phép chọn 5 ảnh.');
       newFileList = newFileList.slice(0, 5);
@@ -379,7 +389,9 @@ const AddProductPage = () => {
   };
 
   const onChangeImageBackground = (info: any) => {
-    const newFileList = [...info.fileList];
+    const newFileList = [
+      { ...info.fileList[info.fileList.length - 1], status: 'done' },
+    ];
     if (newFileList.length > 1) {
       newFileList.shift();
     }
@@ -425,7 +437,7 @@ const AddProductPage = () => {
                 <Input placeholder="Nhập tên sản phẩm" />
               </Form.Item>
               <Row justify={'space-between'} className=" mb-2" gutter={[15, 5]}>
-                <Col className="sm:w-full lg:w-1/3 sm:min-w-[256px] lg:min-w-[100px]">
+                <Col className="sm:w-full lg:w-1/2 sm:min-w-[256px] lg:min-w-[100px]">
                   <Form.Item
                     label="Giá sản phẩm"
                     name={'old_price'}
@@ -434,7 +446,7 @@ const AddProductPage = () => {
                     <Input placeholder="Nhập giá" />
                   </Form.Item>
                 </Col>
-                <Col className="sm:w-full lg:w-1/3 sm:min-w-[256px] lg:min-w-[100px]">
+                <Col className="sm:w-full lg:w-1/2 sm:min-w-[256px] lg:min-w-[100px]">
                   <Form.Item
                     label="Giá giảm"
                     name={'price'}
@@ -443,7 +455,7 @@ const AddProductPage = () => {
                     <Input placeholder={`Nhập giá giảm`} />
                   </Form.Item>
                 </Col>
-                <Col className="sm:w-full lg:w-1/3 sm:min-w-[256px] lg:min-w-[100px]">
+                {/* <Col className="sm:w-full lg:w-1/3 sm:min-w-[256px] lg:min-w-[100px]">
                   <Form.Item
                     label="Số lượng"
                     name={'quantity'}
@@ -451,7 +463,7 @@ const AddProductPage = () => {
                   >
                     <Input placeholder="Nhập số lượng" />
                   </Form.Item>
-                </Col>
+                </Col> */}
               </Row>
               <Form.Item
                 label="Mô tả sản phẩm"
