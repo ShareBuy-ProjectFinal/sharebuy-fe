@@ -5,16 +5,13 @@ import {
   Form,
   Input,
   Row,
-  Select,
   Space,
   Typography,
   Upload,
   UploadFile,
 } from 'antd';
 import { AddIcon, RollBackIcon } from 'assets/svgs';
-import ButtonAction from 'components/Button/ButtonAction';
 import ButtonCustom from 'components/Button/ButtonCustom';
-import ButtonDownload from 'components/Button/ButtonDownload';
 import SelectForm from 'components/Input/SelectForm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import LableCustom from 'components/Text/LableCustom';
@@ -24,19 +21,12 @@ import React, { memo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PATH } from 'routes/Path';
 import { toastError, toastSucess } from 'utils/toats';
-import ModalAddAttribute from './Modal/ModalAddAttribute';
-import { useMediaQuery } from '@uidotdev/usehooks';
 import { useMutation } from '@tanstack/react-query';
-import { AttributeApis } from 'apis/AttributeApis';
 import { useForm } from 'antd/es/form/Form';
-import SelectAddForm from 'components/Input/SelectAddForm';
 import CategoryApis from 'apis/CategoryApis';
-import { checkFormValidate, combine } from 'utils/function';
 import { UploadApis } from 'apis/UploadApis';
 import TableAddProductDetail from './TableAddProductDetail';
-import { dataCategoryMen } from 'mocks/Category/data';
 import ProductApis from 'apis/ProductApis';
-import useQueryParam from 'hook/useQueryParam';
 
 export interface IAttribute {
   optionAttribute: any[];
@@ -56,19 +46,13 @@ const listAttributeDefault: IAttribute[] = [
 
 const ProductDetail = () => {
   const navigate = useNavigate();
-  const isSmallScreen = useMediaQuery('(max-width: 1024px)');
+  // const isSmallScreen = useMediaQuery('(max-width: 1024px)');
   const { user } = useUser();
   const [form] = useForm();
   const { id } = useParams<{ id: string }>();
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [isAddAttribute, setIsAddAttribute] = useState(true);
   const [optionCategory, setOptionCategory] = useState<any>([]);
   const [optionCategoryValue, setOptionCategoryValue] = useState<any>([]);
-  const [optionAttribute, setOptionAttribute] = useState<any>([]);
-  const [listAttribute, setListAttribute] =
-    useState<IAttribute[]>(listAttributeDefault);
-  const [attributeSelected, setAttributeSelected] = useState<IAttribute>();
   const [backgroundImage, setBackgroundImage] = useState<UploadFile[] | any>(
     [],
   );
@@ -174,39 +158,6 @@ const ProductDetail = () => {
     },
   });
 
-  const mutateAddProductDetail = useMutation({
-    mutationFn: ProductApis.createProductDetail,
-    onSuccess: (data: any) => {
-      console.log('data', data);
-    },
-    onError: (error) => {
-      console.log('error', error);
-    },
-  });
-
-  const mutateAddProduct = useMutation({
-    mutationFn: ProductApis.createProduct,
-    onSuccess: (data: any) => {
-      // console.log('data', data);
-      dataProDetails.forEach((item: any) => {
-        mutateAddProductDetail.mutate({
-          product_id: data._id as string,
-          name: data.product_name, // Provide appropriate value
-          old_price: item.price, // Provide appropriate value
-          price: item.price, // Provide appropriate value
-          quantity: item.quantity, // Provide appropriate value
-          image: item?.url, // Provide appropriate value
-          custom_attribute_values:
-            item.listAttribute.map((item: any) => item.value) || [],
-        });
-      });
-      toastSucess('Thêm sản phẩm thành công');
-    },
-    onError: (error) => {
-      console.log('error', error);
-    },
-  });
-
   //=======================================================================================================
   const mutateGetProductById = useMutation({
     mutationFn: ProductApis.getById,
@@ -221,12 +172,6 @@ const ProductDetail = () => {
       mutateGetProductDetail.mutate(data._id);
       mutateCategoryValue.mutate(data.category_id);
 
-      setListAttribute(
-        data.custom_attributes.map((item: any) => ({
-          attribute_id: item._id,
-          optionAttribute: [{ value: item._id, label: item.attribute_name }],
-        })),
-      );
       setBackgroundImage([
         {
           uid: '-1',
@@ -756,15 +701,6 @@ const ProductDetail = () => {
           </Flex>
         </Flex>
       </Form>
-
-      <ModalAddAttribute
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        isAdd={isAddAttribute}
-        attribute={attributeSelected}
-        listAttribute={listAttribute}
-        optionAttribute={optionAttribute}
-      />
     </Space>
   );
 };
