@@ -122,11 +122,11 @@ const ProductDetail = () => {
       const promises = uploadFiles.map((file, index) => {
         if (file?.originFileObj) {
           const formData = new FormData();
-          if (file.originFileObj) formData.append('file', file.originFileObj);
+          if (file?.originFileObj) formData.append('file', file.originFileObj);
           return UploadApis.uploadImage(formData)
             .then((res: any) => {
               if (isBackGround) backgroundImage[0].url = res.url;
-              else dataProDetails[index].url = res.url;
+              else fileList[index].url = res.url;
               return res;
             })
             .catch((error) => {
@@ -274,7 +274,7 @@ const ProductDetail = () => {
   const mutateUpdateProduct = useMutation({
     mutationFn: ProductApis.updateProduct,
     onSuccess: (data) => {
-      console.log('data', data);
+      // console.log('data', data);
       toastSucess('Cập nhật sản phẩm thành công');
     },
     onError: (error) => {
@@ -285,7 +285,7 @@ const ProductDetail = () => {
   const mutateUpdateProductDetail = useMutation({
     mutationFn: ProductApis.updateProductDetail,
     onSuccess: (data) => {
-      console.log('data', data);
+      // console.log('data', data);
     },
     onError: (error) => {
       console.log('error', error);
@@ -300,46 +300,46 @@ const ProductDetail = () => {
   }, [user]);
 
   const handldFinish = async (values: any) => {
-    // if (backgroundImage.length == 0) {
-    //   toastError('Vui lòng chọn ảnh nền');
-    //   return;
-    // }
-    // if (fileList.length == 0) {
-    //   toastError('Vui lòng chọn ảnh chi tiết');
-    //   return;
-    // }
+    if (backgroundImage.length == 0) {
+      toastError('Vui lòng chọn ảnh nền');
+      return;
+    }
+    if (fileList.length == 0) {
+      toastError('Vui lòng chọn ảnh chi tiết');
+      return;
+    }
 
-    // const uploadImage = await Promise.all([
-    //   mutateUploadImage.mutateAsync({
-    //     uploadFiles: backgroundImage,
-    //     isBackGround: true,
-    //   }),
-    //   mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
-    //   mutateUploadImageDetail.mutateAsync(dataProDetails),
-    // ]);
-    // // console.log('uploadImage', uploadImage);
-    // const { category_id, category_value_id, quantity, ...params } =
-    //   form.getFieldsValue();
-    // mutateUpdateProduct.mutate({
-    //   ...params,
-    //   _id: id,
-    //   image: uploadImage[0]?.[0]?.url,
-    //   images: uploadImage[1].map((item: any) => item.url),
-    //   category_id: category_value_id,
-    // });
+    const uploadImage = await Promise.all([
+      mutateUploadImage.mutateAsync({
+        uploadFiles: backgroundImage,
+        isBackGround: true,
+      }),
+      mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
+      mutateUploadImageDetail.mutateAsync(dataProDetails),
+    ]);
+    console.log('uploadImage', uploadImage);
+    const { category_id, category_value_id, quantity, ...params } =
+      form.getFieldsValue();
+    mutateUpdateProduct.mutate({
+      ...params,
+      _id: id,
+      image: uploadImage[0]?.[0]?.url,
+      images: uploadImage[1].map((item: any) => item.url),
+      category_id: category_value_id,
+    });
 
-    // dataProDetails.forEach((item: any) => {
-    //   mutateUpdateProductDetail.mutate({
-    //     _id: item._id,
-    //     price: item.price,
-    //     quantity: item.quantity,
-    //     image: item.image,
-    //   });
-    // });
+    dataProDetails.forEach((item: any) => {
+      mutateUpdateProductDetail.mutate({
+        _id: item._id,
+        price: item.price,
+        quantity: item.quantity,
+        image: item.image,
+      });
+    });
 
     // console.log('backgroundImage', backgroundImage);
     // console.log('fileList', fileList);
-    console.log('dataProDetails', dataProDetails);
+    // console.log('dataProDetails', dataProDetails);
   };
 
   const handleChangeCategory = (value: any) => {
@@ -750,7 +750,7 @@ const ProductDetail = () => {
                 />
               </Col>
               <Col>
-                <ButtonCustom size="px-9 py-2" value="Tiếp tục" fill />
+                <ButtonCustom size="px-9 py-2" value="Chỉnh sửa" fill />
               </Col>
             </Row>
           </Flex>
