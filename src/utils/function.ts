@@ -1,5 +1,14 @@
 import { FormInstance } from 'antd';
+import dayjs from 'dayjs';
 import queryString from 'query-string';
+
+export type DateFormatOption =
+  | 'DD/MM/YYYY'
+  | 'DD/MM/YYYY HH:mm:ss'
+  | 'MM/DD/YYYY HH:mm:ss'
+  | 'YYYY-MM-DD HH:mm:ss'
+  | 'HH:mm DD/MM/YYYY'
+  | 'HH:mm';
 
 export function updateQueryStringParameter(search: string, newParams: any) {
   const searchObj = queryString.parse(search);
@@ -71,4 +80,8 @@ export const generateUUID = (): string => {
     const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+};
+
+export const formatDate = (value: string | Date, option?: DateFormatOption) => {
+  return dayjs(value).format(option || 'DD/MM/YYYY HH:mm:ss');
 };

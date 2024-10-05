@@ -1,0 +1,48 @@
+.button {
+  display: flex;
+  margin-top: 4px;
+  padding: 8px 20px;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.button:disabled {
+  color: white;
+  background-color: #c2c2c2;
+  border-color: transparent;
+  cursor: not-allowed;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.error {
+  background-color: #dc362e;
+  border-color: transparent;
+}
+
+.approve {
+  background-color: #038f00;
+  border-color: transparent;
+}
+
+.primary {
+  color: #00538f;
+  background-color: white;
+
+  &:not(:disabled):hover {
+    color: white;
+    background-color: #00538f;
+  }
+}
+
+.fill {
+  color: white;
+  background-color: #00538f;
+}
