@@ -10,21 +10,30 @@ import {
 } from 'antd';
 import { AddIcon } from 'assets/svgs';
 import TableCustom from 'components/Table/TableCustom';
+import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
 import { dataCategoryMen } from 'mocks/Category/data';
-import React, { useMemo, useState } from 'react';
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useMemo,
+  useState,
+} from 'react';
+import formatNumber from 'utils/function';
+import { exportExcel_v2 } from 'utils/functionExport';
 import { toastError } from 'utils/toats';
 
 interface IProps {
   data: any;
+  isAdd?: boolean;
 }
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
-const TableAddProductDetail = (props: IProps) => {
+const TableAddProductDetail = forwardRef((props: IProps, ref: any) => {
+  const { data, isAdd = false } = props;
   const [refresh, setRefresh] = useState(false);
-  const { data } = props;
   const [backgroundImage, setBackgroundImage] = useState<any[]>([]);
-  const columns: TableColumnsType<any> = [
+  const columns: ColumnsTypeCustom = [
     {
       title: 'STT',
       width: 50,
@@ -32,6 +41,15 @@ const TableAddProductDetail = (props: IProps) => {
       dataIndex: 'stt',
       render: (value: any, record: any, index: number) => index + 1,
     },
+    ...(!isAdd
+      ? [
+          {
+            title: 'Mã chi tiết sản phẩm',
+            dataIndex: '_id',
+            width: 170,
+          },
+        ]
+      : []),
     {
       title: 'Ảnh',
       width: 150,
@@ -58,7 +76,7 @@ const TableAddProductDetail = (props: IProps) => {
         >
           {value ? (
             <div style={{ position: 'relative' }}>
-              <img src={value} alt="avatar" />
+              <img src={value} alt="avatar" className="border" />
               <Button
                 type="primary"
                 shape="circle"
@@ -84,8 +102,9 @@ const TableAddProductDetail = (props: IProps) => {
     },
     {
       title: 'Danh sách thuộc tính',
-      //   width: 50,
+      width: 200,
       dataIndex: 'listAttribute',
+      isShowRender: true,
       render: (value, record) =>
         value.map((item: any) => item.label).join(', '),
     },
@@ -93,6 +112,7 @@ const TableAddProductDetail = (props: IProps) => {
       title: 'Giá',
       width: 150,
       dataIndex: 'price',
+      type: 'number',
       render: (item, record, index) => (
         <Input
           type="number"
@@ -103,18 +123,27 @@ const TableAddProductDetail = (props: IProps) => {
     },
     {
       title: 'Số lượng',
+      type: 'number',
       width: 90,
       dataIndex: 'quantity',
-      render: (item, record, index) => (
-        <Input
-          type="number"
-          defaultValue={item}
-          onChange={(value) => onChangeQuantiy(value, index)}
-        />
-      ),
+      render: (item, record, index) => formatNumber(item),
+      //    (
+      //   <Input
+      //     type="number"
+      //     defaultValue={item}
+      //     onChange={(value) => onChangeQuantiy(value, index)}
+      //   />
+      // ),
     },
   ];
 
+  useImperativeHandle(ref, () => ({
+    handleDownload,
+  }));
+
+  const handleDownload = () => {
+    exportExcel_v2(columns, data, 'Danh sách chi tiết sản phẩm');
+  };
   const getBase64 = (img: FileType, callback: (url: string) => void) => {
     const reader = new FileReader();
     reader.addEventListener('load', () => callback(reader.result as string));
@@ -148,6 +177,6 @@ const TableAddProductDetail = (props: IProps) => {
   };
 
   return <TableCustom columns={columns} dataSource={data} />;
-};
+});
 
 export default TableAddProductDetail;

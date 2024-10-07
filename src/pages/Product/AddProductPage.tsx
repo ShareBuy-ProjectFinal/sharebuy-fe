@@ -379,11 +379,11 @@ const AddProductPage = () => {
 
   const onChangeImageDetail = (info: any) => {
     info.file.status = 'done';
-    let newFileList = [...info.fileList];
-    if (newFileList.length > 5) {
-      toastError('Chỉ được phép chọn 5 ảnh.');
-      newFileList = newFileList.slice(0, 5);
-    }
+    const newFileList = [...info.fileList];
+    // if (newFileList.length > 5) {
+    //   toastError('Chỉ được phép chọn 5 ảnh.');
+    //   newFileList = newFileList.slice(0, 5);
+    // }
 
     setFileList(newFileList);
   };
@@ -560,9 +560,9 @@ const AddProductPage = () => {
             </Space>
 
             {/* Table các sản phẩm chi tiết*/}
-            <LableCustom value={'Thông tin thuộc tính'} />
+            <LableCustom value={'Chi tiết sản phẩm'} />
             <Divider className="mt-0 mb-0 border" />
-            <TableAddProductDetail data={dataProDetails} />
+            <TableAddProductDetail data={dataProDetails} isAdd />
           </SpaceCustom>
           {/* </div> */}
 

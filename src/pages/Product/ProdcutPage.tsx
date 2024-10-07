@@ -8,9 +8,6 @@ import {
   Row,
   Select,
   Space,
-  Table,
-  TableColumnsType,
-  Tag,
   Typography,
 } from 'antd';
 import { ColumnType } from 'antd/es/table';
@@ -23,16 +20,16 @@ import PopupConfirm from 'components/Popup/PopupConfirm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
 import TextCustom from 'components/Text/TextCustom';
-import { auth } from 'configs/firebaseConfig';
 import { useUser } from 'contexts/UserProvider';
 import useQueryParam from 'hook/useQueryParam';
+import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
 import { dataTopProducts } from 'mocks/Dashboard/data';
-import { dataProducts } from 'mocks/Product/data';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
 import { DEFAULT_PAGE_SIZE } from 'utils/constants';
 import formatNumber from 'utils/function';
+import { exportExcel_v2 } from 'utils/functionExport';
 import { HocChangePagination } from 'utils/HocChangePagination';
 import { toastSucess } from 'utils/toats';
 
@@ -56,11 +53,12 @@ const ProdcutPage = () => {
   const valueSearchDebounce = useDebounce(valueSearch, 500);
   const [checkall, setCheckall] = useState<boolean>(false);
   const [dataSelected, setDataSelected] = useState<any[]>([]);
-  const columnTopProducts: TableColumnsType<any> = [
+  const columnTopProducts: ColumnsTypeCustom = [
     {
       title: <Checkbox checked={checkall} onChange={handleCheckAll} />,
       width: 35,
       dataIndex: 'checkall',
+      isShow: false,
       render: (vale, record) => (
         <Checkbox
           checked={
@@ -93,25 +91,41 @@ const ProdcutPage = () => {
       title: 'Tồn kho',
       dataIndex: 'quantity',
       width: 100,
+      type: 'number',
     },
     {
       title: 'Giá',
       width: 130,
       dataIndex: 'price',
       render: (text) => `${formatNumber(text)} VND`,
+      isShowRender: true,
     },
     {
       align: 'center',
       title: 'Đánh giá',
+      type: 'number',
       width: 100,
       dataIndex: 'average_rating',
       render: (text) => (text ? text.toFixed(2) : 'Chưa có đánh giá'),
     },
   ];
 
+  const mutateProductByShopIdExport = useMutation({
+    mutationFn: ProductApis.getByShopId,
+    onSuccess: (data, variables) => {
+      if (variables.export)
+        exportExcel_v2(columnTopProducts, data.data, 'Danh sách ản phẩm');
+    },
+    onError: (error) => {
+      console.log('error', error);
+    },
+  });
+
   const mutateProductByShopId = useMutation({
     mutationFn: ProductApis.getByShopId,
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
+      if (variables.export)
+        exportExcel_v2(columnTopProducts, data.data, 'Danh sách ản phẩm');
       console.log('data', data);
     },
     onError: (error) => {
@@ -152,7 +166,13 @@ const ProdcutPage = () => {
 
   const handleDownload = () => {
     // toastSucess('Tải thành công');
-    console.log('user', user);
+    // total: mutateProductByShopId?.data?.pagination.totalProducts || 0,
+    mutateProductByShopIdExport.mutate({
+      id: user?._id,
+      page: 0,
+      page_size: mutateProductByShopId?.data?.pagination.totalProducts,
+      export: true,
+    });
   };
 
   const handleAddOrder = () => {
@@ -215,8 +235,9 @@ const ProdcutPage = () => {
           </Space>
         </Row>
         <TableCustom
+          loading={mutateProductByShopId.isPending}
           columns={columnTopProducts}
-          dataSource={mutateProductByShopId?.data?.data || dataProducts}
+          dataSource={mutateProductByShopId?.data?.data}
           rowClassName={'cursor-pointer'}
           pagination={{
             current: page + 1,

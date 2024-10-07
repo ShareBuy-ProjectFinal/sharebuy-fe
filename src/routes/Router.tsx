@@ -24,6 +24,8 @@ import RevenueDashboardPage from 'pages/Dashboard/RevenueDashboardPage';
 import AddProductPage from 'pages/Product/AddProductPage';
 import CategoryDetailPage from 'pages/Category/CategoryDetailPage';
 import ProductDetail from 'pages/Product/ProductDetail';
+import InventoryPage from 'pages/Inventory/InventoryPage';
+import InventoryDetailPage from 'pages/Inventory/InventoryDetailPage';
 
 export const Router = () => {
   const token = localStorage.getItem('token');
@@ -59,6 +61,14 @@ export const Router = () => {
         {
           path: PATH.order,
           element: <OrderPage />,
+        },
+        {
+          path: PATH.inventory,
+          element: <InventoryPage />,
+        },
+        {
+          path: PATH.inventoryDetail,
+          element: <InventoryDetailPage />,
         },
         {
           path: PATH.category,

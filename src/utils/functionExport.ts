@@ -93,6 +93,7 @@ export const exportExcelWithManySheet = (
     if (isMergeCell)
       dataExport.unshift(new Array(dataExport[0].length).fill(''));
 
+    console.log('data', data);
     data.length != 0 &&
       data.forEach((data: any) => {
         const rowData = preprocessHeaderFilter.map((column: any) => {

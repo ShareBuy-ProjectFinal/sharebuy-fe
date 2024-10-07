@@ -22,7 +22,7 @@ const TableCustom = (
       rowKey={(record) =>
         record._id || record.id || record.key || generateUUID()
       }
-      scroll={{ x: 175 }}
+      scroll={{ x: 'max-content', y: 'max-content' }}
       size="middle"
       {...props}
       pagination={

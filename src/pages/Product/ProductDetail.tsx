@@ -17,7 +17,7 @@ import SpaceCustom from 'components/Space/SpaceCustom';
 import LableCustom from 'components/Text/LableCustom';
 import TextCustom from 'components/Text/TextCustom';
 import { useUser } from 'contexts/UserProvider';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PATH } from 'routes/Path';
 import { toastError, toastSucess } from 'utils/toats';
@@ -27,6 +27,8 @@ import CategoryApis from 'apis/CategoryApis';
 import { UploadApis } from 'apis/UploadApis';
 import TableAddProductDetail from './TableAddProductDetail';
 import ProductApis from 'apis/ProductApis';
+import ButtonDownload from 'components/Button/ButtonDownload';
+import { exportExcel_v2 } from 'utils/functionExport';
 
 export interface IAttribute {
   optionAttribute: any[];
@@ -46,6 +48,7 @@ const listAttributeDefault: IAttribute[] = [
 
 const ProductDetail = () => {
   const navigate = useNavigate();
+  const childRef = useRef<any>();
   // const isSmallScreen = useMediaQuery('(max-width: 1024px)');
   const { user } = useUser();
   const [form] = useForm();
@@ -58,7 +61,6 @@ const ProductDetail = () => {
   );
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [dataProDetails, setDataProDetails] = useState<any>([]);
-
   const mutateCategory = useMutation({
     mutationFn: CategoryApis.getAll,
     onSuccess: (data: any) => {
@@ -299,12 +301,12 @@ const ProductDetail = () => {
 
   const onChangeImageDetail = (info: any) => {
     info.file.status = 'done';
-    let newFileList = [...info.fileList];
+    const newFileList = [...info.fileList];
 
-    if (newFileList.length > 5) {
-      toastError('Chỉ được phép chọn 5 ảnh.');
-      newFileList = newFileList.slice(0, 5);
-    }
+    // if (newFileList.length > 5) {
+    //   toastError('Chỉ được phép chọn 5 ảnh.');
+    //   newFileList = newFileList.slice(0, 5);
+    // }
 
     setFileList(newFileList);
   };
@@ -319,9 +321,13 @@ const ProductDetail = () => {
     setBackgroundImage(newFileList);
   };
 
+  const handleDownload = () => {
+    if (childRef && childRef.current) childRef.current.handleDownload();
+  };
+
   return (
     <Space className="pt-7 pb-7 px-8 w-full" direction="vertical">
-      <Space direction="vertical" size={2}>
+      <Flex vertical>
         <Space
           className="text-[#7E84A3] cursor-pointer"
           onClick={() => navigate(PATH.product)}
@@ -329,10 +335,16 @@ const ProductDetail = () => {
           <RollBackIcon />
           Quay lại
         </Space>
-        <Typography.Text className="text-3xl font-bold">
-          Thêm sản phẩm
-        </Typography.Text>
-      </Space>
+
+        <Flex justify="space-between" align="center">
+          <Typography.Text className="text-3xl font-bold">
+            Thêm sản phẩm
+          </Typography.Text>
+          <Space>
+            <ButtonDownload onClick={handleDownload} />
+          </Space>
+        </Flex>
+      </Flex>
 
       <Form
         form={form}
@@ -376,15 +388,6 @@ const ProductDetail = () => {
                     <Input placeholder={`Nhập giá giảm`} />
                   </Form.Item>
                 </Col>
-                {/* <Col className="sm:w-full lg:w-1/3 sm:min-w-[256px] lg:min-w-[100px]">
-                  <Form.Item
-                    label="Số lượng"
-                    name={'quantity'}
-                    className="w-full mb-1"
-                  >
-                    <Input placeholder="Nhập số lượng" />
-                  </Form.Item>
-                </Col> */}
               </Row>
               <Form.Item
                 label="Mô tả sản phẩm"
@@ -395,71 +398,10 @@ const ProductDetail = () => {
               </Form.Item>
             </Space>
 
-            {/* Thông tin thuộc tính */}
-            {/* <Divider className="mt-4 mb-1 border" />
-            <Space direction="vertical" className="w-full m-0 " size={0}>
-              <LableCustom value={'Thông tin thuộc tính'} />
-              {listAttribute.map((item, index: number) => (
-                <Row
-                  justify={'space-between'}
-                  className="mb-2 mt-1 w-full"
-                  gutter={[15, 5]}
-                  key={index}
-                >
-                  <Col className="sm:w-full lg:w-2/5 sm:min-w-[256px] lg:min-w-[50px]">
-                    <Form.Item
-                      {...(!isSmallScreen &&
-                        index == 0 && { label: 'Tên thuộc tính' })}
-                      className="w-full mb-1"
-                      // name={`attribute_id_${index}`}
-                    >
-                      <div>
-                        <SelectForm
-                          disabled={true}
-                          size="middle"
-                          placeholder={`Chọn thuộc tính`}
-                          className="flex-grow"
-                          options={listAttribute[index].optionAttribute}
-                          value={item?.attribute_id}
-                          // onChange={(value) => onChangeAttribute(value, index)}
-                          // handleOnlickAdd={() => {
-                          //   setIsOpen(true);
-                          //   setIsAddAttribute(true);
-                          //   setAttributeSelected(undefined);
-                          // }}
-                        />
-                      </div>
-                    </Form.Item>
-                  </Col>
-                  <Col className="sm:w-full lg:w-3/5 sm:min-w-[256px] lg:min-w-[100px]">
-                    <Flex align="flex-end" gap={5}>
-                      <Form.Item
-                        {...(!isSmallScreen &&
-                          index == 0 && { label: 'Giá trị thuộc tính' })}
-                        className="mb-0 flex-grow"
-                        // name={`attribute_value_${index}`}
-                      >
-                        <div>
-                          <SelectForm
-                            disabled={true}
-                            size="middle"
-                            placeholder={`Chọn giá trị thuộc tính`}
-                            mode="multiple"
-                            options={listAttribute[index].optionAttributeValues}
-                            value={item?.attributeValue_ids}
-                          />
-                        </div>
-                      </Form.Item>
-                    </Flex>
-                  </Col>
-                </Row>
-              ))}
-            </Space> */}
-
             {/* Table các sản phẩm chi tiết*/}
-            <LableCustom value={'Thông tin thuộc tính'} />
+            <LableCustom value={'Chi tiết sản phẩm'} className="!mb-0" />
             <Divider className="mt-0 mb-0 border" />
-            <TableAddProductDetail data={dataProDetails} />
+            <TableAddProductDetail data={dataProDetails} ref={childRef} />
           </SpaceCustom>
           {/* </div> */}
 

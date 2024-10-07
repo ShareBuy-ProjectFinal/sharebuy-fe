@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  CodepenOutlined,
   LeftOutlined,
   MailOutlined,
   RightOutlined,
@@ -39,6 +40,7 @@ const selectedKeys = [
   [PATH.product, PATH.addProduct, PATH.productDetail],
   [PATH.category, PATH.categoryDetail],
   [PATH.customer],
+  [PATH.inventory, PATH.inventoryDetail],
   [PATH.report],
   [PATH.salesdeal],
   [PATH.chat],
@@ -96,6 +98,11 @@ export const Sidebar = () => {
     getItem('Sản phẩm', PATH.product, <ProductIcon />),
     getItem('Phân loại', PATH.category, <CategoryIcon />),
     getItem('Khách hàng', PATH.customer, <CustomerIcon />),
+    getItem(
+      'Nhập/Xuất kho',
+      PATH.inventory,
+      <CodepenOutlined style={{ fontSize: 24, color: '#ffffff' }} />,
+    ),
     getItem('Báo cáo', PATH.report, <ReportIcon />),
     getItem('Mã giãm giá', PATH.salesdeal, <SalesdealIcon />),
     getItem('Tin nhắn', PATH.chat, <Chat />),
