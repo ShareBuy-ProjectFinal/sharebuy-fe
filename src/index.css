@@ -57,6 +57,19 @@ code {
   background-color: white !important;
 }
 
+.tablecomponent .ant-table-thead .ant-table-cell::before {
+  width: 0 !important;
+}
+
+.tablecomponent .ant-table-thead .ant-table-cell {
+  font-size: 14px !important;
+  line-height: 18px !important;
+  font-weight: 700 !important;
+  color: #00538f !important;
+  border: none !important;
+  background-color: #eff3f8 !important;
+}
+
 .ant-table-thead .ant-table-cell::before {
   width: 0 !important;
 }

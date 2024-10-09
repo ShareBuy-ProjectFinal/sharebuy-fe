@@ -6,6 +6,7 @@ const SelectForm = (props: SelectProps) => {
       allowClear
       optionFilterProp="children"
       filterOption={(input: any, option: any) => {
+        if (typeof input.label !== 'string') return false;
         if (typeof option?.label === 'number') {
           return option.label.toString().includes(input);
         }
@@ -15,6 +16,11 @@ const SelectForm = (props: SelectProps) => {
           .includes(input.toLowerCase());
       }}
       filterSort={(optionA: any, optionB: any) => {
+        if (
+          typeof optionA.label !== 'string' ||
+          typeof optionB.label !== 'string'
+        )
+          return false;
         if (
           typeof optionA?.label === 'number' ||
           typeof optionB?.label === 'number'

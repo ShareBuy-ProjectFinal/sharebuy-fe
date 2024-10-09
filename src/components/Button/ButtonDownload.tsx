@@ -1,3 +1,4 @@
+import { UploadOutlined } from '@ant-design/icons';
 import { Button, ButtonProps } from 'antd';
 import { DownloadBlueIcon, DownloadIcon } from 'assets/svgs';
 import React, { forwardRef } from 'react';
@@ -19,8 +20,8 @@ const ButtonDownload = forwardRef<
       {...props}
       ref={ref}
     >
-      <DownloadIcon />
-      Xuất
+      <UploadOutlined style={{ fontSize: '22px', fontWeight: 'bold' }} />
+      Export
     </Button>
   );
 });

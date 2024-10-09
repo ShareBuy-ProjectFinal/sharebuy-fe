@@ -124,9 +124,7 @@ const ProdcutPage = () => {
   const mutateProductByShopId = useMutation({
     mutationFn: ProductApis.getByShopId,
     onSuccess: (data, variables) => {
-      if (variables.export)
-        exportExcel_v2(columnTopProducts, data.data, 'Danh sách ản phẩm');
-      console.log('data', data);
+      // console.log('data', data);
     },
     onError: (error) => {
       console.log('error', error);

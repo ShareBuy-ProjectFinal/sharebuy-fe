@@ -2,6 +2,7 @@ import { Col, Flex, Row, Space, Typography } from 'antd';
 import { RollBackIcon } from 'assets/svgs';
 import ButtonAction from 'components/Button/ButtonAction';
 import ButtonDownload from 'components/Button/ButtonDownload';
+import ButtonUpload from 'components/Button/ButtonUpload';
 import LableValue from 'components/Dashboard/LableValue';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
@@ -15,11 +16,6 @@ import { PATH } from 'routes/Path';
 const InventoryDetailPage = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-
-  const handleEditRow = (e: any, record: any) => {
-    e.stopPropagation();
-    console.log('record', record);
-  };
 
   const columns: ColumnsTypeCustom = [
     { title: 'STT', dataIndex: 'stt', width: 40 },
@@ -40,6 +36,11 @@ const InventoryDetailPage = () => {
   useEffect(() => {
     console.log('id', id);
   }, []);
+
+  const handleEditRow = (e: any, record: any) => {
+    e.stopPropagation();
+    console.log('record', record);
+  };
 
   const handleDownload = () => {
     // if (childRef && childRef.current) childRef.current.handleDownload();
@@ -66,7 +67,7 @@ const InventoryDetailPage = () => {
         </Flex>
       </Flex>
 
-      <SpaceCustom className="w-full">
+      <div className="bg-white p-5 w-full rounded-lg shadow-md">
         <Row justify={'space-between'} className="w-full">
           <Col>
             <Row>
@@ -123,7 +124,7 @@ const InventoryDetailPage = () => {
             </Row>
           </Col>
         </Row>
-      </SpaceCustom>
+      </div>
 
       <SpaceCustom>
         <TableCustom

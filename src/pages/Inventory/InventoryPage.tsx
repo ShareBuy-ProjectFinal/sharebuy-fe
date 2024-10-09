@@ -1,17 +1,24 @@
 import { Flex, Space, Typography } from 'antd';
 import ButtonAdd from 'components/Button/ButtonAdd';
 import ButtonDownload from 'components/Button/ButtonDownload';
+import ButtonUpload from 'components/Button/ButtonUpload';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
+import { Upload } from 'components/Upload/Upload';
+import { UploadModal } from 'components/UploadModal_V2';
 import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
 import { dataInvetory } from 'mocks/Inventory/data';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
+import { URL_IMPORT_TEMPLATE_FILE } from 'utils/constants';
 import { formatDate } from 'utils/function';
+import { IMPORT_ROUTE } from 'utils/importId';
+import InventoryModalAdd from './InventoryModalAdd';
 
 const InventoryPage = () => {
   const navigate = useNavigate();
+  const [isOpenAddModal, setIsOpenAddModal] = useState(false);
 
   const columns: ColumnsTypeCustom = [
     {
@@ -46,7 +53,7 @@ const InventoryPage = () => {
     },
   ];
   const handleAddOrder = () => {
-    navigate(PATH.inventory);
+    setIsOpenAddModal(true);
   };
 
   const handleDownload = () => {
@@ -59,6 +66,7 @@ const InventoryPage = () => {
     //   export: true,
     // });
   };
+
   return (
     <Flex className="pt-7 pb-5 px-8" vertical gap={20}>
       <Flex justify="space-between" align="center">
@@ -93,6 +101,11 @@ const InventoryPage = () => {
           // className="cursor-pointer"
         />
       </SpaceCustom>
+
+      <InventoryModalAdd
+        isOpen={isOpenAddModal}
+        setIsOpen={setIsOpenAddModal}
+      />
     </Flex>
   );
 };
