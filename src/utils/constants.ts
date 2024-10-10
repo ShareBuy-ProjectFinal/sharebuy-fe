@@ -42,10 +42,13 @@ export const removeElementsByIndices = (
 export const DEFAULT_PAGE_SIZE = 10;
 
 const getURLFromFileField = (field: string) => {
+  // return `https://docs.google.com/spreadsheets/d/${field}/export?format=xlsx`;
   return `https://docs.google.com/spreadsheets/d/${field}/export?format=xlsx`;
 };
 
 export const URL_IMPORT_TEMPLATE_FILE = {
-  SALE_TEAM: getURLFromFileField('1kv0UdWRgtKUL6QgxI5qjS1_VpXPgSaz8'),
-  HO_FOLLOW_PLAN: getURLFromFileField('1onMvSBD4KjBntQaNW4vDjfjYSQTqNxYC'),
+  INVENTORY_EXPORT_IMPORT: getURLFromFileField(
+    '1mGtS2wcdMth2yeovuP5ukV53XOu4nA64',
+  ),
+  t: 'https://docs.google.com/spreadsheets/d/1mGtS2wcdMth2yeovuP5ukV53XOu4nA64/edit?usp=sharing&ouid=100137600501649479802&rtpof=true&sd=true',
 };

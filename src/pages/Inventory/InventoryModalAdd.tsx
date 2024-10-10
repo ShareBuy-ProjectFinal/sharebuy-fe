@@ -1,7 +1,7 @@
+import { CloseCircleTwoTone, SaveTwoTone } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query';
 import {
   Col,
-  DatePicker,
   Flex,
   Form,
   Image,
@@ -16,26 +16,23 @@ import { useForm } from 'antd/es/form/Form';
 import ProductApis from 'apis/ProductApis';
 import Button from 'components/Button/Button';
 import ButtonAction from 'components/Button/ButtonAction';
-import ButtonAdd from 'components/Button/ButtonAdd';
-import ButtonUpload from 'components/Button/ButtonUpload';
 import Content from 'components/Content/Content';
-import SelectForm from 'components/Input/SelectForm';
+import InputNumberForm from 'components/Input/InputNumberForm';
 import LazySelectForm, {
   ILazySelectData,
   ILazySelectParams,
   initLazySelectData,
 } from 'components/Select/LazySelectForm';
 import TableComponent from 'components/Table/TableComponent';
-import TableCustom from 'components/Table/TableCustom';
 import TextCustom from 'components/Text/TextCustom';
 import { UploadModal } from 'components/UploadModal_V2';
 import { useUser } from 'contexts/UserProvider';
 import dayjs from 'dayjs';
 import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
-import React, { memo, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { URL_IMPORT_TEMPLATE_FILE } from 'utils/constants';
-import { formatDate } from 'utils/function';
-import { IMPORT_ROUTE } from 'utils/importId';
+import formatNumber, { checkFormValidate, formatDate } from 'utils/function';
+import { toastError } from 'utils/toats';
 
 const optionTypes = [
   {
@@ -55,28 +52,120 @@ const InventoryModalAdd = (props: IProps) => {
   const { isOpen, setIsOpen, type = 'create' } = props;
   const { user } = useUser();
   const [form] = useForm();
+  const [indexEdit, setIndexEdit] = useState<number>(-1);
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
   const [products, setProduct] = useState<ILazySelectData>(initLazySelectData);
   const [optionsProductDetail, setOptionsProductDetail] = useState<any[]>([]);
+  const [dataNewInventory, setDataNewInventory] = useState<any[]>([
+    {
+      product_id: '66f99743a95a6154c8ed8777',
+      product_name:
+        'Tai Nghe Có Dây X5 Pro Gaming Super Bass Chống Ồn Cực Tốt Có Mic Đàm Thoại1',
+      product_detail_id: '66f99743a95a6154c8ed8779',
+      attribute: 'Đen',
+      price: 1,
+      quantity: 1,
+      total: 1,
+    },
+  ]);
 
   const columns: ColumnsTypeCustom = [
-    { title: 'STT', dataIndex: 'stt', width: 50 },
-    { title: 'Mã sản phẩm', dataIndex: 'productCode', width: 150 },
-    { title: 'Tên sản phẩm', dataIndex: 'productName', width: 200 },
-    { title: 'Số lượng', dataIndex: 'quantity', width: 100 },
-    { title: 'Giá nhập', dataIndex: 'price', width: 100 },
-    { title: 'Thành tiền', dataIndex: 'total', width: 100 },
-    ...(type !== 'create'
-      ? ([
-          {
-            fixed: 'right',
-            width: 40,
-            render: (value: any, record: any) => (
-              <ButtonAction edit onClick={(e) => handleEditRow(e, record)} />
-            ),
-          },
-        ] as ColumnsTypeCustom)
-      : []),
+    {
+      title: 'STT',
+      dataIndex: 'stt',
+      width: 40,
+      align: 'center',
+      render: (value: any, record: any, index: number) => index + 1,
+    },
+    // { title: 'Mã sản phẩm', dataIndex: 'product_id', width: 230 },
+    { title: 'Tên sản phẩm', dataIndex: 'product_name', width: 280 },
+    { title: 'Thuộc tính', dataIndex: 'attribute', width: 120 },
+    {
+      title: 'Số lượng',
+      dataIndex: 'quantity',
+      width: 100,
+      align: 'right',
+      render: (value, record, number) =>
+        number === indexEdit ? (
+          <Form.Item
+            initialValue={value}
+            name={'quantityEdit'}
+            className="m-0"
+            wrapperCol={{ span: 24 }}
+          >
+            <InputNumberForm
+              placeholder="Số lượng"
+              onChange={handleEditQuantity}
+            />
+          </Form.Item>
+        ) : (
+          formatNumber(value)
+        ),
+    },
+    {
+      title: 'Giá nhập',
+      dataIndex: 'price',
+      width: 100,
+      align: 'right',
+      render: (value, record, number) =>
+        number === indexEdit ? (
+          <Form.Item
+            name={'priceEdit'}
+            className="m-0"
+            wrapperCol={{ span: 24 }}
+          >
+            <InputNumberForm placeholder="Giá" onChange={handleEditPrice} />
+          </Form.Item>
+        ) : (
+          formatNumber(value)
+        ),
+    },
+    {
+      title: 'Thành tiền',
+      dataIndex: 'total',
+      width: 100,
+      align: 'right',
+      render: (value, record, number) =>
+        number === indexEdit ? (
+          <Form.Item
+            name={'totalEdit'}
+            className="m-0"
+            wrapperCol={{ span: 24 }}
+          >
+            <InputNumberForm disabled />
+          </Form.Item>
+        ) : (
+          formatNumber(value)
+        ),
+    },
+    {
+      fixed: 'right',
+      width: 40,
+      render: (_, record, index) => {
+        return indexEdit === index ? (
+          <Space size={'middle'} className="text-lg ">
+            <ButtonAction tooltip="Lưu" onClick={() => handleSaveRow(record)}>
+              <SaveTwoTone style={{ fontSize: 20 }} />
+            </ButtonAction>
+            <ButtonAction tooltip="Hủy" onClick={handleCancelRow}>
+              <CloseCircleTwoTone style={{ fontSize: 20 }} />
+            </ButtonAction>
+          </Space>
+        ) : (
+          <Space>
+            <ButtonAction
+              edit
+              onClick={(e) => handleEditRow(e, index)}
+              disabled={indexEdit !== -1}
+            />
+            <ButtonAction
+              onClick={(e) => handleDeleteRow(e, index)}
+              disabled={indexEdit !== -1}
+            />
+          </Space>
+        );
+      },
+    },
   ];
 
   const mutateProductByShopId = useMutation({
@@ -105,7 +194,7 @@ const InventoryModalAdd = (props: IProps) => {
               </Space>
             </Tooltip>
           ),
-          value: item._id,
+          value: item._id + '-.-' + item.product_name,
           displayName: item.product_name,
         })),
         totalItems: data.pagination.totalProducts,
@@ -116,21 +205,34 @@ const InventoryModalAdd = (props: IProps) => {
     },
   });
 
-  const mutateGetProductDetail = useMutation({
+  const mutateGetAllProductDetailByProductid = useMutation({
     mutationFn: ProductApis.getProductDetails,
     onSuccess: (data: any[]) => {
       // console.log('data', data);
       setOptionsProductDetail(
-        data.map((proDetail) => ({
-          label: proDetail.custom_attribute_values
+        data.map((proDetail) => {
+          const label = proDetail.custom_attribute_values
             .map((item: any) => item.value)
-            .join(', '),
-          value: proDetail._id,
-        })),
+            .join(', ');
+          return {
+            label,
+            value: proDetail._id + '-.-' + label,
+          };
+        }),
       );
     },
     onError: (error) => {
       console.log('error', error);
+    },
+  });
+
+  const mutateProductDetailById = useMutation({
+    mutationFn: ProductApis.getProductDetailById,
+    onSuccess: (data) => {
+      // console.log('data', data);
+    },
+    onError: (error) => {
+      console.log('error ProductDetailById', error);
     },
   });
 
@@ -140,26 +242,128 @@ const InventoryModalAdd = (props: IProps) => {
     }
   }, [isOpen, user]);
 
-  const handleEditRow = (e: any, record: any) => {
+  const handleEditRow = (e: any, index: any) => {
     e.stopPropagation();
-    console.log('record', record);
+    setIndexEdit(index);
+    form.setFieldsValue({
+      quantityEdit: dataNewInventory[index].quantity,
+      priceEdit: dataNewInventory[index].price,
+      totalEdit: dataNewInventory[index].total,
+    });
   };
 
-  const onOk = () => {
-    console.log('form', form.getFieldsValue());
+  const handleDeleteRow = (e: any, index: any) => {
+    e.stopPropagation();
+    setDataNewInventory((prev) => {
+      const data = [...prev];
+      data.splice(index, 1);
+      return data;
+    });
+  };
+
+  const handleSaveRow = (record: any) => {
+    const { quantityEdit, priceEdit } = form.getFieldsValue([
+      'quantityEdit',
+      'priceEdit',
+    ]);
+    setDataNewInventory((prev) => {
+      const data = [...prev];
+      data[indexEdit] = {
+        ...data[indexEdit],
+        quantity: quantityEdit,
+        price: priceEdit,
+        total: quantityEdit * priceEdit,
+      };
+      return data;
+    });
+    handleCancelRow();
+  };
+
+  const handleCancelRow = () => {
+    setIndexEdit(-1);
+    form.resetFields(['quantityEdit', 'priceEdit', 'totalEdit']);
+  };
+
+  const handleEditQuantity = useCallback((value: any) => {
+    form.setFieldsValue({
+      totalEdit: value * parseFloat(form.getFieldValue('priceEdit')),
+    });
+  }, []);
+
+  const handleEditPrice = (value: any) => {
+    form.setFieldsValue({
+      totalEdit: value * form.getFieldValue('quantityEdit'),
+    });
+  };
+
+  const onOk = async () => {
+    if (indexEdit !== -1) {
+      toastError('Vui lòng lưu hoặc hủy chỉnh sửa trước khi tạo phiếu');
+      return;
+    }
+    if (!(await checkFormValidate(form))) {
+      toastError('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+    const { ncc, type } = form.getFieldsValue();
+    console.log('form', dataNewInventory, ncc, type);
   };
 
   const onCancel = () => {
+    form.resetFields();
     setIsOpen(false);
   };
 
   const handleAdd = () => {
-    console.log('add order');
+    const { product, productDetail, price, quantity } = form.getFieldsValue();
+    if (!product) {
+      toastError('Vui lòng chọn sản phẩm');
+      return;
+    }
+    if (!productDetail) {
+      toastError('Vui lòng chọn sản phẩm chi tiết');
+      return;
+    }
+    if (!price) {
+      toastError('Vui lòng nhập giá');
+      return;
+    }
+    if (!quantity) {
+      toastError('Vui lòng nhập số lượng');
+      return;
+    }
+    setDataNewInventory((prev) => {
+      const productDetailSplit = productDetail.split('-.-');
+      const productSplit = product.split('-.-');
+      const index = prev.findIndex(
+        (item) => item.product_detail_id === productDetailSplit[0],
+      );
+      if (index !== -1) {
+        if (prev[index].price == price) {
+          prev[index].quantity += parseInt(quantity);
+          prev[index].total = prev[index].quantity * prev[index].price;
+          return [...prev];
+        }
+      }
+      return [
+        ...prev,
+        {
+          product_id: productSplit[0],
+          product_name: productSplit[1],
+          product_detail_id: productDetailSplit[0],
+          attribute: productDetailSplit[1],
+          price: price,
+          quantity: parseInt(quantity),
+          total: price * quantity,
+        },
+      ];
+    });
+    form.resetFields(['product', 'productDetail', 'price', 'quantity']);
+    setOptionsProductDetail([]);
   };
 
-  const onChangeProduct = (value: any) => {
-    console.log('value', value);
-    mutateGetProductDetail.mutate(value);
+  const onChangeProduct = (value: any, option: any) => {
+    mutateGetAllProductDetailByProductid.mutate(value.split('-.-')[0]);
   };
 
   const handleProductSelectScrollChange = (params: ILazySelectParams) => {
@@ -216,8 +420,13 @@ const InventoryModalAdd = (props: IProps) => {
                 </Form.Item>
               </Col>
               <Col span={7}>
-                <Form.Item className="mb-0" label="Giá" layout="horizontal">
-                  <Input placeholder="Giá" />
+                <Form.Item
+                  className="mb-0"
+                  name={'price'}
+                  label="Giá"
+                  layout="horizontal"
+                >
+                  <InputNumberForm placeholder="Giá" />
                 </Form.Item>
               </Col>
               <Col span={3}>
@@ -235,6 +444,7 @@ const InventoryModalAdd = (props: IProps) => {
                   className="mb-0"
                   label="Chi tiết sản phẩm"
                   layout="horizontal"
+                  name={'productDetail'}
                 >
                   <Select
                     options={optionsProductDetail}
@@ -247,10 +457,10 @@ const InventoryModalAdd = (props: IProps) => {
                 <Form.Item
                   className="mb-0"
                   label="Số lượng"
-                  name={'qunatity'}
+                  name={'quantity'}
                   layout="horizontal"
                 >
-                  <Input placeholder="Số lượng" />
+                  <InputNumberForm placeholder="Số lượng" />
                 </Form.Item>
               </Col>
               <Col span={3}>
@@ -262,7 +472,7 @@ const InventoryModalAdd = (props: IProps) => {
                 />
               </Col>
             </Row>
-            <TableComponent columns={columns} />
+            <TableComponent columns={columns} dataSource={dataNewInventory} />
           </Content>
 
           {/* right */}
@@ -270,7 +480,6 @@ const InventoryModalAdd = (props: IProps) => {
             <Form.Item
               className="mb-2"
               label="Ngày"
-              name={'date'}
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
             >
@@ -282,6 +491,7 @@ const InventoryModalAdd = (props: IProps) => {
               name={'type'}
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
+              rules={[{ required: true, message: 'Vui lòng chọn loại phiếu' }]}
             >
               <Select
                 options={optionTypes}
@@ -295,6 +505,7 @@ const InventoryModalAdd = (props: IProps) => {
               name={'ncc'}
               labelCol={{ span: 24 }}
               wrapperCol={{ span: 24 }}
+              rules={[{ required: true, message: 'Vui lòng nhập thông tin' }]}
             >
               <Input placeholder="Nhập nhà cung cấp/Khách hàng" />
             </Form.Item>
@@ -304,10 +515,9 @@ const InventoryModalAdd = (props: IProps) => {
 
       {/* import */}
       <UploadModal
-        importId={IMPORT_ROUTE}
         downloadTemplate={{
           fileName: 'Nhập/xuất kho',
-          url: URL_IMPORT_TEMPLATE_FILE.SALE_TEAM,
+          url: URL_IMPORT_TEMPLATE_FILE.INVENTORY_EXPORT_IMPORT,
         }}
         open={isOpenImportModal}
         title={'Thêm hoá đơn nhập/xuất kho'}
@@ -316,17 +526,43 @@ const InventoryModalAdd = (props: IProps) => {
           // refetchListRoute();
         }}
         setOpen={setIsOpenImportModal}
-        handleConfirm={(data) => {
-          // data.map((item: any) => {
-          //   const newObj: { [key: string]: any } = {};
-          //   for (const key in item) {
-          //    console.log("")
-          //   }
-          //   return newObj;
-          // }),
-          console.log('data', data[0]);
-          for (const key in data[0]) {
-            console.log('key', key, data[0][key]);
+        handleConfirm={async (data) => {
+          const propsAttribute = ['product_detail_id', 'price', 'quantity'];
+          const recordError: any = [];
+          const promises = data.map((item: any, i: number) => {
+            const newObj: any = {};
+            let index = 0;
+            for (const key in item) {
+              if (key == 'id') continue;
+              newObj[propsAttribute[index++]] = item[key];
+            }
+            return mutateProductDetailById
+              .mutateAsync(newObj.product_detail_id)
+              .then((res) => {
+                const attribute = res.custom_attribute_values
+                  .map((item: any) => item.value)
+                  .join(', ');
+                newObj.product_id = res.product._id;
+                newObj.product_name = res.product.product_name;
+                newObj.attribute = attribute;
+                newObj.price = parseFloat(newObj.price);
+                newObj.quantity = parseInt(newObj.quantity);
+                newObj.total = newObj.price * newObj.quantity;
+                return newObj;
+              })
+              .catch((error) => {
+                console.log('error', error);
+                recordError.push(i + 1);
+              });
+          });
+          const result = await Promise.all(promises);
+          if (recordError.length > 0) {
+            toastError(
+              `Không tìm thấy sản phầm dòng ${recordError.join(', ')}`,
+            );
+          } else {
+            setDataNewInventory((prev) => [...prev, ...result]);
+            setIsOpenImportModal(false);
           }
         }}
       />

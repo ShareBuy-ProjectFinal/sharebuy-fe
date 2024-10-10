@@ -37,7 +37,7 @@ export enum IUploadModules {
 }
 
 type IUploadModal = {
-  importId: string;
+  importId?: string;
   downloadTemplate: TDownLoadTemplate;
   cancelTitle?: string;
   okTitle?: string;

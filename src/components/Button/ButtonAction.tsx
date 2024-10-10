@@ -8,6 +8,7 @@ interface IProps extends ButtonProps {
   edit?: boolean;
   isIcon?: boolean;
   tooltip?: string;
+  children?: React.ReactNode;
 }
 
 const ButtonAction = memo(
@@ -25,7 +26,15 @@ const ButtonAction = memo(
           }
           ref={ref}
         >
-          {isIcon ? edit ? <EditIcon /> : <DeleteIcon /> : null}
+          {children ? (
+            children
+          ) : isIcon ? (
+            edit ? (
+              <EditIcon />
+            ) : (
+              <DeleteIcon />
+            )
+          ) : null}
         </Button>
       );
     },

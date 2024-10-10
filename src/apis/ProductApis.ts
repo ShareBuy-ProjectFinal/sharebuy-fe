@@ -42,6 +42,9 @@ const ProductApis = {
   getProductDetails: async (productId: any): Promise<any> => {
     return await axiosClient.get(`${pathDetail}/products/${productId}`);
   },
+  getProductDetailById: async (productDetailId: any): Promise<any> => {
+    return await axiosClient.get(`${pathDetail}/${productDetailId}`);
+  },
 };
 
 export default ProductApis;

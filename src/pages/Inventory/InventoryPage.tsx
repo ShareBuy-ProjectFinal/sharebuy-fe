@@ -7,14 +7,14 @@ import TableCustom from 'components/Table/TableCustom';
 import { Upload } from 'components/Upload/Upload';
 import { UploadModal } from 'components/UploadModal_V2';
 import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
-import { dataInvetory } from 'mocks/Inventory/data';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from 'routes/Path';
 import { URL_IMPORT_TEMPLATE_FILE } from 'utils/constants';
-import { formatDate } from 'utils/function';
+import formatNumber, { formatDate } from 'utils/function';
 import { IMPORT_ROUTE } from 'utils/importId';
 import InventoryModalAdd from './InventoryModalAdd';
+import { dataInventorys } from 'mocks/Inventory/data';
 
 const InventoryPage = () => {
   const navigate = useNavigate();
@@ -25,6 +25,7 @@ const InventoryPage = () => {
       title: 'STT',
       dataIndex: 'stt',
       width: 40,
+      render: (value, record, index) => index + 1,
     },
     {
       title: 'Mã',
@@ -49,7 +50,9 @@ const InventoryPage = () => {
     },
     {
       title: 'Tổng tiền',
+      dataIndex: 'total',
       width: 150,
+      render: (value) => formatNumber(value),
     },
   ];
   const handleAddOrder = () => {
@@ -84,7 +87,7 @@ const InventoryPage = () => {
           // loading={mutateProductByShopId.isPending}
           columns={columns}
           rowClassName={'cursor-pointer'}
-          dataSource={dataInvetory}
+          dataSource={dataInventorys}
           // pagination={{
           //   current: page + 1,
           //   pageSize: page_size,
