@@ -13,6 +13,7 @@ import {
   Tooltip,
 } from 'antd';
 import { useForm } from 'antd/es/form/Form';
+import { InventoryApis } from 'apis/InventoryApis';
 import ProductApis from 'apis/ProductApis';
 import Button from 'components/Button/Button';
 import ButtonAction from 'components/Button/ButtonAction';
@@ -28,46 +29,37 @@ import TextCustom from 'components/Text/TextCustom';
 import { UploadModal } from 'components/UploadModal_V2';
 import { useUser } from 'contexts/UserProvider';
 import dayjs from 'dayjs';
+import { IInventoryNew } from 'interfaces/Inventory/Inventory.interface';
 import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { URL_IMPORT_TEMPLATE_FILE } from 'utils/constants';
 import formatNumber, { checkFormValidate, formatDate } from 'utils/function';
-import { toastError } from 'utils/toats';
+import { toastError, toastSucess } from 'utils/toats';
 
 const optionTypes = [
   {
     label: 'Nhập hàng',
-    value: 'Nhập hàng',
+    value: 'IN',
   },
-  { label: 'Xuất hàng', value: 'Xuất hàng' },
+  { label: 'Xuất hàng', value: 'OUT' },
 ];
 
 interface IProps {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   type?: 'import' | 'export' | 'create';
+  handleOK: (data: IInventoryNew) => void;
 }
 
 const InventoryModalAdd = (props: IProps) => {
-  const { isOpen, setIsOpen, type = 'create' } = props;
+  const { isOpen, setIsOpen, type = 'create', handleOK } = props;
   const { user } = useUser();
   const [form] = useForm();
   const [indexEdit, setIndexEdit] = useState<number>(-1);
   const [isOpenImportModal, setIsOpenImportModal] = useState(false);
   const [products, setProduct] = useState<ILazySelectData>(initLazySelectData);
   const [optionsProductDetail, setOptionsProductDetail] = useState<any[]>([]);
-  const [dataNewInventory, setDataNewInventory] = useState<any[]>([
-    {
-      product_id: '66f99743a95a6154c8ed8777',
-      product_name:
-        'Tai Nghe Có Dây X5 Pro Gaming Super Bass Chống Ồn Cực Tốt Có Mic Đàm Thoại1',
-      product_detail_id: '66f99743a95a6154c8ed8779',
-      attribute: 'Đen',
-      price: 1,
-      quantity: 1,
-      total: 1,
-    },
-  ]);
+  const [dataNewInventory, setDataNewInventory] = useState<any[]>([]);
 
   const columns: ColumnsTypeCustom = [
     {
@@ -306,7 +298,16 @@ const InventoryModalAdd = (props: IProps) => {
       return;
     }
     const { ncc, type } = form.getFieldsValue();
-    console.log('form', dataNewInventory, ncc, type);
+    handleOK({
+      shop_id: user?._id,
+      type: type,
+      supplier: ncc,
+      inventory_history_details: dataNewInventory.map((item) => ({
+        inventory_id: item.product_detail_id,
+        quantity: item.quantity,
+        origin_price: item.price,
+      })),
+    });
   };
 
   const onCancel = () => {
@@ -468,6 +469,7 @@ const InventoryModalAdd = (props: IProps) => {
                   title="Thêm"
                   customClass="!py-1 !mt-0"
                   fill
+                  type="button"
                   handleOnclick={handleAdd}
                 />
               </Col>

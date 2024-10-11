@@ -1,6 +1,8 @@
 import { CloseCircleTwoTone, SaveTwoTone } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import { Col, Flex, Form, Row, Space, Typography } from 'antd';
 import { useForm } from 'antd/es/form/Form';
+import { InventoryApis } from 'apis/InventoryApis';
 import { RollBackIcon } from 'assets/svgs';
 import ButtonAction from 'components/Button/ButtonAction';
 import ButtonDownload from 'components/Button/ButtonDownload';
@@ -10,16 +12,25 @@ import InputNumberForm from 'components/Input/InputNumberForm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
 import TextCustom from 'components/Text/TextCustom';
+import { useUser } from 'contexts/UserProvider';
+import useQueryParam from 'hook/useQueryParam';
 import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
 import { dataInventoryItem } from 'mocks/Inventory/data';
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PATH } from 'routes/Path';
-import formatNumber from 'utils/function';
+import formatNumber, { formatDate } from 'utils/function';
+import { exportExcel_v2 } from 'utils/functionExport';
+import { HocChangePagination } from 'utils/HocChangePagination';
+import { toastSucess } from 'utils/toats';
 
 const InventoryDetailPage = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const { id } = useParams<{ id: string }>();
+  const queryParams = useQueryParam();
+  const page = parseInt(queryParams.get('page') + '') - 1 || 0;
+  const page_size = parseInt(queryParams.get('page_size') + '') || 10;
   const [indexEdit, setIndexEdit] = useState(-1);
   const [form] = useForm();
   const [dataTable, setDataTable] = useState<any>(dataInventoryItem);
@@ -31,14 +42,25 @@ const InventoryDetailPage = () => {
       width: 40,
       render: (value, record, index) => index + 1,
     },
-    { title: 'Mã sản phẩm', dataIndex: 'productCode', width: 100 },
-    { title: 'Tên sản phẩm', dataIndex: 'productName', width: 200 },
-    { title: 'Thuộc tính', dataIndex: 'attribute', width: 120 },
+    // { title: 'Mã sản phẩm', dataIndex: 'productCode', width: 100 },
+    {
+      title: 'Tên sản phẩm',
+      dataIndex: ['product_detail', 'product', 'product_name'],
+      width: 200,
+    },
+    {
+      title: 'Thuộc tính',
+      dataIndex: ['product_detail', 'custom_attribute_values'],
+      width: 120,
+      isShowRender: true,
+      render: (value) => value.map((item: any) => item.value).join(', '),
+    },
     {
       title: 'Số lượng',
       dataIndex: 'quantity',
       width: 100,
       align: 'right',
+      type: 'number',
       render: (value, record, number) =>
         number === indexEdit ? (
           <Form.Item
@@ -58,9 +80,10 @@ const InventoryDetailPage = () => {
     },
     {
       title: 'Giá nhập',
-      dataIndex: 'price',
+      dataIndex: 'origin_price',
       width: 100,
       align: 'right',
+      type: 'number',
       render: (value, record, number) =>
         number === indexEdit ? (
           <Form.Item
@@ -76,9 +99,10 @@ const InventoryDetailPage = () => {
     },
     {
       title: 'Thành tiền',
-      dataIndex: 'total',
+      dataIndex: 'total_price',
       width: 100,
       align: 'right',
+      type: 'number',
       render: (value, record, number) =>
         number === indexEdit ? (
           <Form.Item
@@ -92,39 +116,70 @@ const InventoryDetailPage = () => {
           formatNumber(value)
         ),
     },
-    {
-      fixed: 'right',
-      width: 40,
-      render: (_, record, index) => {
-        return indexEdit === index ? (
-          <Space size={'middle'} className="text-lg ">
-            <ButtonAction tooltip="Lưu" onClick={() => handleSaveRow(record)}>
-              <SaveTwoTone style={{ fontSize: 20 }} />
-            </ButtonAction>
-            <ButtonAction tooltip="Hủy" onClick={handleCancelRow}>
-              <CloseCircleTwoTone style={{ fontSize: 20 }} />
-            </ButtonAction>
-          </Space>
-        ) : (
-          <Space>
-            <ButtonAction
-              edit
-              onClick={(e) => handleEditRow(e, record, index)}
-              disabled={indexEdit !== -1}
-            />
-            <ButtonAction
-              onClick={(e) => handleDeleteRow(e, index)}
-              disabled={indexEdit !== -1}
-            />
-          </Space>
-        );
-      },
-    },
+    // {
+    //   fixed: 'right',
+    //   width: 40,
+    //   render: (_, record, index) => {
+    //     return indexEdit === index ? (
+    //       <Space size={'middle'} className="text-lg ">
+    //         <ButtonAction tooltip="Lưu" onClick={() => handleSaveRow(record)}>
+    //           <SaveTwoTone style={{ fontSize: 20 }} />
+    //         </ButtonAction>
+    //         <ButtonAction tooltip="Hủy" onClick={handleCancelRow}>
+    //           <CloseCircleTwoTone style={{ fontSize: 20 }} />
+    //         </ButtonAction>
+    //       </Space>
+    //     ) : (
+    //       <Space>
+    //         <ButtonAction
+    //           edit
+    //           onClick={(e) => handleEditRow(e, record, index)}
+    //           disabled={indexEdit !== -1}
+    //         />
+    //         <ButtonAction
+    //           onClick={(e) => handleDeleteRow(e, index)}
+    //           disabled={indexEdit !== -1}
+    //         />
+    //       </Space>
+    //     );
+    //   },
+    // },
   ];
 
+  const mutateInventoryDetail = useMutation({
+    mutationFn: InventoryApis.getInventoryDetailById,
+    onSuccess: (data, variables) => {
+      console.log('data', data);
+    },
+    onError: (error) => {
+      console.log('error mutateInventoryDetail', error);
+    },
+  });
+
+  const mutateInventoryDetailExport = useMutation({
+    mutationFn: InventoryApis.getInventoryDetailById,
+    onSuccess: (data, variables) => {
+      exportExcel_v2(
+        columns,
+        data.data.history_details,
+        `Chi tiết phiếu ${mutateInventoryDetail?.data?.data.inventory_receipt._id}`,
+      );
+      toastSucess('Xuất file thành công');
+    },
+    onError: (error) => {
+      console.log('error mutateInventoryDetail', error);
+    },
+  });
+
   useEffect(() => {
-    console.log('id', id);
-  }, []);
+    if (user && id) {
+      mutateInventoryDetail.mutate({
+        inventoryId: id,
+        page,
+        limit: page_size,
+      });
+    }
+  }, [user]);
 
   const handleEditRow = (e: any, record: any, index: any) => {
     e.stopPropagation();
@@ -185,7 +240,11 @@ const InventoryDetailPage = () => {
   };
 
   const handleDownload = () => {
-    // if (childRef && childRef.current) childRef.current.handleDownload();
+    mutateInventoryDetailExport.mutate({
+      inventoryId: id || '',
+      page,
+      limit: mutateInventoryDetail?.data?.pagination.totalCount || 1000,
+    });
   };
 
   return (
@@ -201,7 +260,7 @@ const InventoryDetailPage = () => {
 
         <Flex justify="space-between" align="center">
           <Typography.Text className="text-3xl font-bold">
-            Chi tiết nhập/xuất kho
+            Chi tiết: {mutateInventoryDetail?.data?.data.inventory_receipt._id}
           </Typography.Text>
           <Space>
             <ButtonDownload onClick={handleDownload} />
@@ -211,15 +270,18 @@ const InventoryDetailPage = () => {
 
       <div className="bg-white p-5 w-full rounded-lg shadow-md">
         <Row justify={'space-between'} className="w-full">
-          <Col>
+          {/* <Col>
             <Row>
               <TextCustom
                 value={`Mã: `}
                 className="font-bold text-lg text-black mr-1"
               />
-              <TextCustom value={`PL0001`} className="font-medium text-lg" />
+              <TextCustom
+                value={mutateInventoryDetail?.data?.data.inventory_receipt._id}
+                className="font-medium text-lg"
+              />
             </Row>
-          </Col>
+          </Col> */}
           <Col>
             <Row>
               <TextCustom
@@ -227,7 +289,10 @@ const InventoryDetailPage = () => {
                 className="font-bold text-lg text-black mr-1"
               />
               <TextCustom
-                value={`11/11/2024`}
+                value={formatDate(
+                  mutateInventoryDetail?.data?.data.inventory_receipt.createdAt,
+                  // 'DD/MM/YYYY',
+                )}
                 className="font-medium text-lg"
               />
             </Row>
@@ -238,7 +303,15 @@ const InventoryDetailPage = () => {
                 value={`Loại: `}
                 className="font-bold text-lg text-black mr-1"
               />
-              <TextCustom value={`Nhập kho`} className="font-medium text-lg" />
+              <TextCustom
+                value={
+                  mutateInventoryDetail?.data?.data.inventory_receipt.type ==
+                  'IN'
+                    ? 'Nhập kho'
+                    : 'Xuất kho'
+                }
+                className="font-medium text-lg"
+              />
             </Row>
           </Col>
           <Col>
@@ -248,7 +321,9 @@ const InventoryDetailPage = () => {
                 className="font-bold text-lg text-black mr-1"
               />
               <TextCustom
-                value={`Nha cung cấp 1`}
+                value={
+                  mutateInventoryDetail?.data?.data.inventory_receipt.supplier
+                }
                 className="font-medium text-lg"
               />
             </Row>
@@ -260,7 +335,12 @@ const InventoryDetailPage = () => {
                 className="font-bold text-lg text-black mr-1"
               />
               <TextCustom
-                value={`200.000.000 VND`}
+                value={
+                  formatNumber(
+                    mutateInventoryDetail?.data?.data?.inventory_receipt
+                      .total_price,
+                  ) + ' VND'
+                }
                 className="font-medium text-lg"
               />
             </Row>
@@ -271,24 +351,17 @@ const InventoryDetailPage = () => {
       <SpaceCustom>
         <Form form={form} layout="vertical">
           <TableCustom
-            // loading={mutateProductByShopId.isPending}
+            loading={mutateInventoryDetail.isPending}
             columns={columns}
-            dataSource={dataTable}
+            dataSource={
+              mutateInventoryDetail?.data?.data?.history_details || []
+            }
             // pagination={{
-            //   current: page + 1,
+            //   current: page,
             //   pageSize: page_size,
-            //   total: mutateProductByShopId?.data?.pagination.totalProducts || 0,
+            //   total: mutateInventoryDetail?.data?.pagination.totalCount || 0,
             //   onChange: HocChangePagination(),
             // }}
-            onRow={(record) => {
-              return {
-                onClick: () => {
-                  console.log('first record', record);
-                  navigate(PATH.inventoryDetailById(record._id || record.key)); //
-                },
-              };
-            }}
-            // className="cursor-pointer"
           />
         </Form>
       </SpaceCustom>
