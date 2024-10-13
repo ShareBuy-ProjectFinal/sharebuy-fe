@@ -133,9 +133,24 @@ const ProdcutPage = () => {
 
   useEffect(() => {
     if (user) {
-      mutateProductByShopId.mutate({ id: user?._id, page, page_size }); //check
+      mutateProductByShopId.mutate({
+        id: user?._id,
+        page,
+        page_size,
+      }); //check
     }
   }, [page, page_size, user]);
+
+  useEffect(() => {
+    if (valueSearchDebounce !== '' && valueSearchDebounce) {
+      mutateProductByShopId.mutate({
+        id: user?._id,
+        page: 0,
+        page_size: 10,
+        name: valueSearchDebounce,
+      });
+    }
+  }, [valueSearchDebounce]);
 
   function handleCheckAll(e: any) {
     if (!e.target.checked) {

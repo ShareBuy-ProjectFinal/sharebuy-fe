@@ -34,9 +34,9 @@ const ProductApis = {
     return await axiosClient.get(`${path}/${productId}`);
   },
   getByShopId: async (data: any): Promise<any> => {
-    const { id, page, page_size } = data;
+    const { id, name, page, page_size } = data;
     return await axiosClient.get(`${path}/shop/${id}`, {
-      params: { page, limit: page_size },
+      params: { page, limit: page_size, ...(name && { name }) },
     });
   },
   getProductDetails: async (productId: any): Promise<any> => {

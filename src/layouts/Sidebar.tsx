@@ -94,7 +94,7 @@ export const Sidebar = () => {
 
   const items: MenuItem[] = [
     getItem('Dashboard', PATH.dashboard, <HomeIcon />),
-    getItem('Đặt hàng', PATH.order, <OrderIcon />),
+    getItem('Đơn hàng', PATH.order, <OrderIcon />),
     getItem('Sản phẩm', PATH.product, <ProductIcon />),
     getItem('Phân loại', PATH.category, <CategoryIcon />),
     getItem('Khách hàng', PATH.customer, <CustomerIcon />),

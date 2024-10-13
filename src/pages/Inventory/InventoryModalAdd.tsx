@@ -369,6 +369,7 @@ const InventoryModalAdd = (props: IProps) => {
 
   const handleProductSelectScrollChange = (params: ILazySelectParams) => {
     mutateProductByShopId.mutate({
+      name: params.value,
       id: user?._id,
       page: 0,
       page_size: params.pageSize,
