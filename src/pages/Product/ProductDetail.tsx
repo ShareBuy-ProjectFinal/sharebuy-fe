@@ -108,16 +108,18 @@ const ProductDetail = () => {
       const promises = uploadFiles.map((file, index) => {
         if (file?.originFileObj) {
           const formData = new FormData();
-          if (file?.originFileObj) formData.append('file', file.originFileObj);
-          return UploadApis.uploadImage(formData)
-            .then((res: any) => {
-              if (isBackGround) backgroundImage[0].url = res.url;
-              else fileList[index].url = res.url;
-              return res;
-            })
-            .catch((error) => {
-              console.log('error', error);
-            });
+          if (file?.originFileObj) {
+            formData.append('file', file.originFileObj);
+            return UploadApis.uploadImage(formData)
+              .then((res: any) => {
+                if (isBackGround) backgroundImage[0].url = res.url;
+                else fileList[index].url = res.url;
+                return res;
+              })
+              .catch((error) => {
+                console.log('error', error);
+              });
+          }
         }
         return {};
       });
@@ -136,10 +138,10 @@ const ProductDetail = () => {
       const promises = base64s.map((item, index) => {
         if (item?.file) {
           const formData = new FormData();
-          formData.append('file', item?.file);
+          formData.append('file', item?.file.originFileObj);
           return UploadApis.uploadImage(formData)
             .then((res: any) => {
-              console.log('res', res);
+              // console.log('res', res);
               dataProDetails[index].image = res?.url;
               return res;
             })
@@ -256,6 +258,10 @@ const ProductDetail = () => {
       return;
     }
 
+    console.log('backgroundImage', backgroundImage);
+    console.log('fileList', fileList);
+    console.log('dataProDetails', dataProDetails);
+
     const uploadImage = await Promise.all([
       mutateUploadImage.mutateAsync({
         uploadFiles: backgroundImage,
@@ -264,14 +270,18 @@ const ProductDetail = () => {
       mutateUploadImage.mutateAsync({ uploadFiles: fileList }),
       mutateUploadImageDetail.mutateAsync(dataProDetails),
     ]);
-    console.log('uploadImage', uploadImage);
+
+    console.log('backgroundImage', backgroundImage);
+    console.log('fileList', fileList);
+    console.log('dataProDetails', dataProDetails);
+
     const { category_id, category_value_id, quantity, ...params } =
       form.getFieldsValue();
     mutateUpdateProduct.mutate({
       ...params,
       _id: id,
-      image: uploadImage[0]?.[0]?.url,
-      images: uploadImage[1].map((item: any) => item.url),
+      image: backgroundImage[0].url,
+      images: fileList.map((item: any) => item.url),
       category_id: category_value_id,
     });
 
@@ -280,13 +290,9 @@ const ProductDetail = () => {
         _id: item._id,
         price: item.price,
         quantity: item.quantity,
-        image: item.image,
+        image: item?.image || null,
       });
     });
-
-    // console.log('backgroundImage', backgroundImage);
-    // console.log('fileList', fileList);
-    // console.log('dataProDetails', dataProDetails);
   };
 
   const handleChangeCategory = (value: any) => {
@@ -330,7 +336,7 @@ const ProductDetail = () => {
       <Flex vertical>
         <Space
           className="text-[#7E84A3] cursor-pointer"
-          onClick={() => navigate(PATH.product)}
+          onClick={() => navigate(-1)}
         >
           <RollBackIcon />
           Quay lại

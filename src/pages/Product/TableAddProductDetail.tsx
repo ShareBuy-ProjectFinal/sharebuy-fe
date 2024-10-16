@@ -155,7 +155,7 @@ const TableAddProductDetail = forwardRef((props: IProps, ref: any) => {
     // console.log('newFileList', newFileList);
     getBase64(newFileList.file.originFileObj as FileType, (url) => {
       data[index].image = url;
-      data[index].file = newFileList.file.originFileObj;
+      data[index].file = newFileList.file;
       setRefresh(!refresh);
     });
   };
