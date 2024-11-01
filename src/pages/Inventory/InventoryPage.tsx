@@ -44,6 +44,7 @@ const InventoryPage = () => {
       title: 'Mã',
       dataIndex: '_id',
       width: 100,
+      render: (value) => '#' + value.slice(-7),
     },
     {
       title: 'Ngày',

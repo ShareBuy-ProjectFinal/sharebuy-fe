@@ -162,7 +162,7 @@ const InventoryDetailPage = () => {
       exportExcel_v2(
         columns,
         data.data.history_details,
-        `Chi tiết phiếu ${mutateInventoryDetail?.data?.data.inventory_receipt._id}`,
+        `Chi tiết phiếu ${mutateInventoryDetail?.data?.data.inventory_receipt._id.slice(-7)}`,
       );
       toastSucess('Xuất file thành công');
     },
@@ -260,7 +260,8 @@ const InventoryDetailPage = () => {
 
         <Flex justify="space-between" align="center">
           <Typography.Text className="text-3xl font-bold">
-            Chi tiết: {mutateInventoryDetail?.data?.data.inventory_receipt._id}
+            Chi tiết:{' '}
+            {`#${mutateInventoryDetail?.data?.data.inventory_receipt._id.slice(-7)}`}
           </Typography.Text>
           <Space>
             <ButtonDownload onClick={handleDownload} />

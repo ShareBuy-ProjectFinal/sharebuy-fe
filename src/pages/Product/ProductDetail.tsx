@@ -205,7 +205,9 @@ const ProductDetail = () => {
       setDataProDetails(
         data.map((proDetail: any) => ({
           _id: proDetail._id,
+          sub_id: '#' + proDetail.sub_id,
           price: proDetail.price,
+          old_price: proDetail.old_price,
           quantity: proDetail.quantity,
           image: proDetail.image,
           listAttribute: proDetail.custom_attribute_values.map((item: any) => ({
@@ -289,6 +291,7 @@ const ProductDetail = () => {
       mutateUpdateProductDetail.mutate({
         _id: item._id,
         price: item.price,
+        old_price: item.old_price,
         quantity: item.quantity,
         image: item?.image || null,
       });

@@ -35,6 +35,7 @@ export interface IProductDetail {
 export interface IProductDetailUpdate {
   _id: string;
   price: any;
+  old_price: any;
   quantity: number;
   image: string;
 }

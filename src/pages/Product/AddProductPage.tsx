@@ -174,7 +174,7 @@ const AddProductPage = () => {
       const promises = base64s.map((item, index) => {
         if (item?.file) {
           const formData = new FormData();
-          formData.append('file', item?.file);
+          formData.append('file', item?.file.originFileObj);
           return UploadApis.uploadImage(formData).then((res: any) => {
             // console.log('res', res);
             dataProDetails[index].imageUrl = res?.url;
@@ -221,6 +221,7 @@ const AddProductPage = () => {
         });
       });
       toastSucess('Thêm sản phẩm thành công');
+      navigate(PATH.productDetailById(data._id));
     },
     onError: (error) => {
       console.log('error', error);
@@ -798,7 +799,17 @@ const AddProductPage = () => {
                 />
               </Col>
               <Col>
-                <ButtonCustom size="px-9 py-2" value="Tiếp tục" fill />
+                <ButtonCustom
+                  size="px-9 py-2"
+                  value="Tiếp tục"
+                  fill
+                  disabled={
+                    mutateAddProduct.isPending ||
+                    mutateAddProductDetail.isPending ||
+                    mutateUploadImage.isPending ||
+                    mutateUploadImageDetail.isPending
+                  }
+                />
               </Col>
             </Row>
           </Flex>

@@ -9,11 +9,13 @@ import {
   UploadProps,
 } from 'antd';
 import { AddIcon } from 'assets/svgs';
+import InputNumberForm from 'components/Input/InputNumberForm';
 import TableCustom from 'components/Table/TableCustom';
 import { ColumnsTypeCustom } from 'interfaces/Table/ColumnsTypeCustom';
 import { dataCategoryMen } from 'mocks/Category/data';
 import React, {
   forwardRef,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useState,
@@ -45,7 +47,7 @@ const TableAddProductDetail = forwardRef((props: IProps, ref: any) => {
       ? [
           {
             title: 'Mã chi tiết sản phẩm',
-            dataIndex: '_id',
+            dataIndex: 'sub_id',
             width: 170,
           },
         ]
@@ -109,32 +111,43 @@ const TableAddProductDetail = forwardRef((props: IProps, ref: any) => {
         value.map((item: any) => item.label).join(', '),
     },
     {
-      title: 'Giá',
+      title: 'Giá giảm',
       width: 150,
       dataIndex: 'price',
       type: 'number',
       render: (item, record, index) => (
-        <Input
-          type="number"
+        <InputNumberForm
+          placeholder="Giá giảm"
           defaultValue={item}
           onChange={(value) => onChangePrice(value, index)}
         />
       ),
     },
+
     {
-      title: 'Số lượng',
+      title: 'Giá sản phẩm',
+      width: 150,
+      dataIndex: 'old_price',
       type: 'number',
-      width: 90,
-      dataIndex: 'quantity',
-      render: (item, record, index) => formatNumber(item),
-      //    (
-      //   <Input
-      //     type="number"
-      //     defaultValue={item}
-      //     onChange={(value) => onChangeQuantiy(value, index)}
-      //   />
-      // ),
+      render: (item, record, index) => (
+        <InputNumberForm
+          placeholder="Giá gốc"
+          defaultValue={item}
+          onChange={(value) => onChangePriceOld(value, index)}
+        />
+      ),
     },
+    ...(!isAdd
+      ? [
+          {
+            title: 'Số lượng',
+            width: 90,
+            type: 'number',
+            dataIndex: 'quantity',
+            render: (item: any, record: any, index: any) => formatNumber(item),
+          } as any,
+        ]
+      : []),
   ];
 
   useImperativeHandle(ref, () => ({
@@ -167,7 +180,13 @@ const TableAddProductDetail = forwardRef((props: IProps, ref: any) => {
   };
 
   const onChangePrice = (value: any, index: any) => {
-    data[index].price = value.target.value;
+    console.log('value', value);
+    data[index].price = value;
+    // setRefresh(!refresh);
+  };
+
+  const onChangePriceOld = (value: any, index: any) => {
+    data[index].old_price = value;
     // setRefresh(!refresh);
   };
 
