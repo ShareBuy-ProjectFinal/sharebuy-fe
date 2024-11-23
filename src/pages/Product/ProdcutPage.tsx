@@ -71,7 +71,7 @@ const ProdcutPage = () => {
     {
       title: 'Sản phẩm',
       dataIndex: 'product_name',
-      // width: 200,
+      width: 600,
       render: (text, record) => (
         <Space align="center">
           <Image

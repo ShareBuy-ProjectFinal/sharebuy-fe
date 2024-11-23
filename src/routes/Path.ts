@@ -9,6 +9,8 @@ export const PATH = {
   dashboard: '/dashboard',
   revenueDashboard: '/dashboard/revenue',
   order: '/order',
+  orderDetail: '/order/:id',
+  orderDetailById: (id: any) => `/order/${id}`,
   product: '/product',
   addProduct: '/product/add',
   inventory: '/inventory',

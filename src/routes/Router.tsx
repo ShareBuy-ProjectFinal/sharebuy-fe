@@ -26,6 +26,7 @@ import CategoryDetailPage from 'pages/Category/CategoryDetailPage';
 import ProductDetail from 'pages/Product/ProductDetail';
 import InventoryPage from 'pages/Inventory/InventoryPage';
 import InventoryDetailPage from 'pages/Inventory/InventoryDetailPage';
+import OrderDetailPage from 'pages/Order/OrderDetailPage';
 
 export const Router = () => {
   const token = localStorage.getItem('token');
@@ -61,6 +62,10 @@ export const Router = () => {
         {
           path: PATH.order,
           element: <OrderPage />,
+        },
+        {
+          path: PATH.orderDetail,
+          element: <OrderDetailPage />,
         },
         {
           path: PATH.inventory,

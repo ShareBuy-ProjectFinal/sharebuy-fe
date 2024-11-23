@@ -1,42 +1,65 @@
+import { CheckOutlined } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
 import { useDebounce } from '@uidotdev/usehooks';
 import {
   Checkbox,
   Flex,
-  Image,
   Input,
   Row,
   Select,
   Space,
-  Table,
   TableColumnsType,
   Tag,
   Typography,
 } from 'antd';
-import { ColumnType } from 'antd/es/table';
-import { Search } from 'assets/svgs';
+import OrderApis, { StatusOrder } from 'apis/OrderApis';
+import { AcceptIcon, Search } from 'assets/svgs';
 import ButtonAction from 'components/Button/ButtonAction';
 import ButtonAdd from 'components/Button/ButtonAdd';
 import ButtonDownload from 'components/Button/ButtonDownload';
 import PopupConfirm from 'components/Popup/PopupConfirm';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import TableCustom from 'components/Table/TableCustom';
+import { useUser } from 'contexts/UserProvider';
+import useQueryParam from 'hook/useQueryParam';
 import { dataTopProducts } from 'mocks/Dashboard/data';
 import { dataOrders } from 'mocks/Order/data';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { PATH } from 'routes/Path';
+import { DEFAULT_PAGE_SIZE } from 'utils/constants';
+import formatNumber, { formatDate } from 'utils/function';
 import { toastSucess } from 'utils/toats';
+import PopupHandleOrder from './PopupHandleOrder';
+import { HocChangePagination } from 'utils/HocChangePagination';
 
 const optionsFilter = [
-  { value: '1', label: 'Lọc 1' },
-  { value: '2', label: 'Lọc 2' },
-  { value: '3', label: 'Lọc 3' },
+  { value: 'all', label: 'Tất cả' },
+  { value: 'PREPARING', label: 'Đang chuẩn bị' },
+  { value: 'DELIVERY', label: 'Đang giao hàng' },
+  { value: 'COMPLETED', label: 'Đã nhận' },
+  { value: 'CANCELED', label: 'Đã huỷ' },
 ];
 
 const OrderPage = () => {
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [valueSearch, setValueSearch] = useState<string>('');
   const valueSearchDebounce = useDebounce(valueSearch, 500);
   const [checkall, setCheckall] = useState<boolean>(false);
   const [dataSelected, setDataSelected] = useState<any[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<StatusOrder | 'all'>(
+    'all',
+  );
+  const [isCancelOrder, setIsCancelOrder] = useState<boolean>(false);
+  const [orderIdHandle, setOrderIdHandle] = useState<string>('');
+
+  const queryParam = useQueryParam();
+  const page = parseInt(queryParam.get('page') + '') - 1 || 0;
+  const page_size =
+    parseInt(queryParam.get('page_size') + '') || DEFAULT_PAGE_SIZE;
+
   const columnTopProducts: TableColumnsType<any> = [
     {
       title: <Checkbox checked={checkall} onChange={handleCheckAll} />,
@@ -54,53 +77,140 @@ const OrderPage = () => {
     },
     {
       title: 'Đơn hàng',
-      dataIndex: 'order',
+      dataIndex: '_id',
       key: 'order',
+      width: 100,
+      render: (value: string) => `#${value.slice(-7)}`,
     },
     {
       title: 'Ngày',
-      dataIndex: 'date',
+      dataIndex: 'createdAt',
       key: 'date',
+      width: 200,
+      render: (value: string) => formatDate(value),
     },
     {
       title: 'Khách hàng',
-      dataIndex: 'customer',
+      dataIndex: ['address', 'userInfo', 'full_name'],
       key: 'customer',
+      width: 180,
     },
     {
       title: 'Trạng thái thanh toán',
-      dataIndex: 'paymentStatus',
-      key: 'paymentStatus',
-      render: (text) => {
-        // Thay đổi màu sắc hoặc kiểu cho trạng thái thanh toán
-        let color = 'green';
-        if (text === 'Đang mua chung') color = 'processing';
-        return <Tag color={color}>{text}</Tag>;
+      dataIndex: 'payment_method',
+      key: 'payment_method',
+      width: 180,
+      render: (value, record) => {
+        const { color, text } = checkStatusPayment(value, record.status);
+        return color == 'success' ? <Tag color={color}>{text}</Tag> : '';
       },
     },
     {
       title: 'Trạng thái đặt hàng',
-      dataIndex: 'orderStatus',
+      dataIndex: 'status',
       key: 'orderStatus',
-      render: (text) => {
-        // Thay đổi màu sắc hoặc kiểu cho trạng thái đặt hàng
-        let color = 'warning';
-        if (text === 'Đã huỷ') color = 'error';
-        if (text === 'Đã nhận') color = 'success';
-        if (text === 'Đang xử lý') color = 'processing';
+      width: 180,
+      render: (value) => {
+        const { color, text } = checkStatusOrder(value);
         return <Tag color={color}>{text}</Tag>;
       },
     },
     {
       title: 'Tổng',
-      dataIndex: 'total',
+      align: 'right',
+      dataIndex: 'total_amount',
       key: 'total',
+      width: 140,
+      render: (value) => formatNumber(value),
+    },
+    {
+      width: 90,
+      fixed: 'right',
+      render: (vaalue, record) =>
+        record.status == ('PREPARING' as StatusOrder) && (
+          <Space size={15}>
+            <ButtonAction onClick={(e) => handleAction(e, record._id, true)} />
+            <ButtonAction onClick={(e) => handleAction(e, record._id, false)}>
+              <AcceptIcon />
+            </ButtonAction>
+          </Space>
+        ),
     },
   ];
 
+  const mutateGetOrderByState = useMutation({
+    mutationFn: OrderApis.getOrderByStatus,
+    onSuccess: (data) => {
+      // console.log('data', data);
+    },
+    onError: (error) => {
+      console.log('error', error);
+    },
+  });
+
+  const mutateUpdateStatusById = useMutation({
+    mutationFn: OrderApis.updateStatusById,
+    onSuccess: (data) => {
+      toastSucess('Cập nhật thành công');
+      mutateGetOrderByState.mutate({
+        userId: user?._id,
+        page,
+        page_size,
+        ...(selectedFilter != 'all' && { status: selectedFilter }),
+      });
+    },
+    onError: (error) => {
+      console.log('error', error);
+    },
+  });
+
   useEffect(() => {
-    valueSearchDebounce && toastSucess('Tìm kiếm: ' + valueSearchDebounce);
-  }, [valueSearchDebounce]);
+    // valueSearchDebounce && toastSucess('Tìm kiếm: ' + valueSearchDebounce);
+    if (user) {
+      mutateGetOrderByState.mutate({
+        userId: user?._id,
+        page,
+        page_size,
+        ...(selectedFilter != 'all' && { status: selectedFilter }),
+      });
+    }
+  }, [user, page, page_size, valueSearchDebounce, selectedFilter]);
+
+  function checkStatusOrder(status: StatusOrder) {
+    switch (status) {
+      case 'PENDING':
+        return { color: 'warning', text: 'Đang chờ thanh toán' };
+      case 'PREPARING':
+        return { color: 'processing', text: 'Đang chuẩn bị' };
+      case 'DELIVERY':
+        return { color: 'cyan', text: 'Đang giao hàng' };
+      case 'COMPLETED':
+        return { color: 'success', text: 'Đã nhận' };
+      default:
+        return { color: 'error', text: 'Đã huỷ' };
+    }
+  }
+
+  function checkStatusPayment(
+    statusPayment: 'MOMO' | 'DIRECT',
+    statusOrder: StatusOrder,
+  ) {
+    switch (statusPayment) {
+      case 'MOMO':
+        return statusOrder != 'CANCELED' && statusOrder != 'PENDING'
+          ? {
+              color: 'success',
+              text: 'Đã thanh toán',
+            }
+          : { color: 'processing', text: 'Chưa thanh toán' };
+      case 'DIRECT':
+        return statusOrder == 'COMPLETED'
+          ? { color: 'success', text: 'Đã thanh toán' }
+          : { color: 'processing', text: 'Chưa thanh toán' };
+      default:
+        return { color: 'processing', text: 'Chưa thanh toán' };
+    }
+  }
 
   function handleCheckAll(e: any) {
     if (!e.target.checked) {
@@ -135,31 +245,34 @@ const OrderPage = () => {
     toastSucess('Thêm đơn hàng thành công');
   };
 
-  const handleEditRow = () => {
-    // toastSucess('Sửa thành công');
+  const handleAction = (e: any, orderId: any, isCancel: boolean) => {
+    e.stopPropagation();
     setIsOpenModal(true);
-    console.log('dataSelected', dataSelected);
-  };
-
-  const handleDeleteRow = () => {
-    setIsOpenModal(true);
-    // toastSucess('Xóa thành công');
+    setIsCancelOrder(isCancel);
+    setOrderIdHandle(orderId);
   };
 
   const handleOk = useCallback(() => {
     setIsOpenModal(false);
-    toastSucess('Xóa thành công');
-  }, [isOpenModal]);
+    mutateUpdateStatusById.mutate({
+      orderId: orderIdHandle,
+      status: isCancelOrder ? 'CANCELED' : 'DELIVERY',
+    });
+  }, [isOpenModal, orderIdHandle]);
 
-  const handleCancel = useCallback(() => {
-    setIsOpenModal(false);
-  }, [isOpenModal]);
+  // const handleCancel = useCallback(() => {
+  //   setIsOpenModal(false);
+  // }, [isOpenModal]);
+
+  const handleOnChangeFilter = (value: StatusOrder | 'all') => {
+    setSelectedFilter(value);
+  };
 
   return (
     <Flex className="pt-7 pb-5 px-8" vertical gap={20}>
       <Flex justify="space-between" align="center">
         <Typography.Text className="text-3xl font-bold">
-          Đặt hàng
+          Đơn hàng
         </Typography.Text>
         <Space>
           <ButtonDownload onClick={handleDownload} />
@@ -174,7 +287,12 @@ const OrderPage = () => {
               className="w-[150px] rounded-md"
               options={optionsFilter}
               placeholder="Lọc"
-              allowClear
+              value={selectedFilter}
+              onChange={handleOnChangeFilter}
+              // allowClear
+              // onClear={() => {
+              //   setSelectedFilter('all');
+              // }}
             />
             <Input
               placeholder="TÌm kiếm"
@@ -185,19 +303,33 @@ const OrderPage = () => {
               allowClear
             />
           </Space>
-          <Space size={15}>
-            <ButtonAction edit onClick={handleEditRow} />
-            <ButtonAction onClick={handleDeleteRow} />
-          </Space>
         </Row>
-        <TableCustom columns={columnTopProducts} dataSource={dataOrders} />
+        <TableCustom
+          loading={mutateGetOrderByState.isPending}
+          columns={columnTopProducts}
+          dataSource={mutateGetOrderByState.data?.data}
+          rowClassName={'cursor-pointer'}
+          pagination={{
+            current: page + 1,
+            pageSize: page_size,
+            total: mutateGetOrderByState?.data?.pagination.totalProducts || 0,
+            onChange: HocChangePagination(),
+          }}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                navigate(PATH.orderDetailById(record._id || record.key)); //
+              },
+            };
+          }}
+        />
       </SpaceCustom>
-      <PopupConfirm
+      <PopupHandleOrder
         isOpen={isOpenModal}
         setIsOpen={setIsOpenModal}
-        value="Bạn có muốn xóa 5 sản phẩm đã chọn không ?" //sửa
+        isCancel={isCancelOrder}
         handleOk={handleOk}
-        handleCancel={handleCancel}
+        // handleCancel={handleCancel}
       />
     </Flex>
   );

@@ -141,13 +141,13 @@ const CustomerPage = () => {
         <Typography.Text className="text-3xl font-bold">
           Khách hàng
         </Typography.Text>
-        <Space>
+        {/* <Space>
           <ButtonDownload onClick={handleDownload} />
           <ButtonAdd onClick={handleAddOrder} fill />
-        </Space>
+        </Space> */}
       </Flex>
 
-      <SpaceCustom direction="vertical">
+      {/* <SpaceCustom direction="vertical">
         <Row justify={'space-between'}>
           <Space>
             <Select
@@ -171,7 +171,7 @@ const CustomerPage = () => {
           </Space>
         </Row>
         <TableCustom columns={columnTopProducts} dataSource={dataTopProducts} />
-      </SpaceCustom>
+      </SpaceCustom> */}
       <PopupConfirm
         isOpen={isOpenModal}
         setIsOpen={setIsOpenModal}

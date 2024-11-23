@@ -36,7 +36,7 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const selectedKeys = [
   [PATH.dashboard, PATH.revenueDashboard, PATH.home],
-  [PATH.order],
+  [PATH.order, PATH.orderDetail],
   [PATH.product, PATH.addProduct, PATH.productDetail],
   [PATH.category, PATH.categoryDetail],
   [PATH.customer],
