@@ -312,7 +312,7 @@ const OrderPage = () => {
           pagination={{
             current: page + 1,
             pageSize: page_size,
-            total: mutateGetOrderByState?.data?.pagination.totalProducts || 0,
+            total: mutateGetOrderByState?.data?.pagination.totalOrders || 0,
             onChange: HocChangePagination(),
           }}
           onRow={(record) => {
