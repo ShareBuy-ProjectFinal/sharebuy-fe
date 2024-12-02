@@ -4,6 +4,7 @@ import queryString from 'query-string';
 
 export type DateFormatOption =
   | 'DD/MM/YYYY'
+  | 'YYYY-MM-DD'
   | 'DD/MM/YYYY HH:mm:ss'
   | 'MM/DD/YYYY HH:mm:ss'
   | 'YYYY-MM-DD HH:mm:ss'
@@ -84,4 +85,26 @@ export const generateUUID = (): string => {
 
 export const formatDate = (value: string | Date, option?: DateFormatOption) => {
   return dayjs(value).format(option || 'DD/MM/YYYY HH:mm:ss');
+};
+
+export const getStartAndEndOfMonth = (date: Date, month?: number) => {
+  // tháng trước đó
+  // const start = dayjs(date).subtract(1, 'month').startOf('month').toDate();
+  // const end = dayjs(date).subtract(1, 'month').endOf('month').toDate();
+
+  if (month) {
+    const start = dayjs(date).month(month).startOf('month').toDate();
+    const end = dayjs(date).month(month).endOf('month').toDate();
+    return [start, end];
+  } else {
+    const start = dayjs(date).startOf('month').toDate();
+    const end = dayjs(date).endOf('month').toDate();
+    return [start, end];
+  }
+};
+
+export const getStartAndEndOfYear = (date: Date) => {
+  const start = dayjs(date).startOf('year').toDate();
+  const end = dayjs(date).endOf('year').toDate();
+  return [start, end];
 };
