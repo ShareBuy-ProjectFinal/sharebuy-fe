@@ -1,6 +1,7 @@
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { Space, Typography } from 'antd';
 import React from 'react';
+import formatNumber from 'utils/function';
 
 interface IProps {
   label: any;
@@ -19,6 +20,7 @@ const LableValue = ({
   isStyle = true,
   reverseOrder = false,
 }: IProps) => {
+  const valueNumber = formatNumber(value);
   return (
     <Space
       className={
@@ -32,7 +34,7 @@ const LableValue = ({
       {reverseOrder ? (
         <>
           <Typography.Text className="text-xl font-bold">
-            {value}
+            {valueNumber}
           </Typography.Text>
           <Typography.Text className="text-[#5A607F]">{label}</Typography.Text>
         </>
@@ -40,7 +42,7 @@ const LableValue = ({
         <>
           <Typography.Text className="text-[#5A607F]">{label}</Typography.Text>
           <Typography.Text className="text-xl font-bold">
-            {value}
+            {valueNumber}
           </Typography.Text>
         </>
       )}{' '}

@@ -12,10 +12,13 @@
     "antd": "^5.19.3",
     "axios": "^1.7.4",
     "axios-retry": "^4.5.0",
+    "chart.js": "^4.4.6",
     "dayjs": "^1.11.13",
+    "faker": "^6.6.6",
     "firebase": "^10.12.5",
     "query-string": "^9.1.0",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-infinite-scroll-component": "^6.1.0",
     "react-router-dom": "^6.25.1",
@@ -52,6 +55,7 @@
     ]
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.2.0",
     "@types/google.maps": "^3.55.12",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
