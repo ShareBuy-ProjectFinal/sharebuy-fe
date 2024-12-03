@@ -11,6 +11,8 @@ import {
   Select,
   Space,
   Table,
+  Tabs,
+  TabsProps,
   Tag,
   Typography,
 } from 'antd';
@@ -35,7 +37,9 @@ import {
   getStartAndEndOfYear,
 } from 'utils/function';
 import { toastSucess } from 'utils/toats';
-import { Chart as ChartJS } from 'chart.js';
+import RevenueByTimeTab from './children/RevenueByTimeTab';
+import RevenueByProduct from './children/RevenueByProductTab';
+import RevenueByCategoryTab from './children/RevenueByCategoryTab';
 
 const optionTimes = [
   { label: '12 giờ trước', value: '12h' },
@@ -43,157 +47,24 @@ const optionTimes = [
   { label: 'Hôm nay', value: 'today' },
 ];
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      labels: {
-        // This more specific font property overrides the global property
-        font: {
-          size: 20,
-        },
-        title: {
-          font: {
-            size: 34,
-          },
-        },
-      },
-      position: 'bottom' as const,
-    },
-    // title: {
-    //   display: true,
-    //   text: 'Chart.js Line Chart',
-    //   font: {
-    //     size: 34,
-    //   },
-    // },
-  },
-};
-
-const labels = [
-  'Tháng 1',
-  'Tháng 2',
-  'Tháng 3',
-  'Tháng 4',
-  'Tháng 5',
-  'Tháng 6',
-  'Tháng 7',
-  'Tháng 8',
-  'Tháng 9',
-  'Tháng 10',
-  'Tháng 11',
-  'Tháng 12',
-];
-
 const DashboardPage = () => {
-  const navigate = useNavigate();
-  const { user } = useUser();
-  const [datasetsChart, setDatasetsChart] = useState<any>([]);
-  const [datasetsChartDay, setDatasetsChartDay] = useState<any>([]);
-
-  const toDay = new Date();
-  const [startDayofMonth, endDayOfMonth] = getStartAndEndOfMonth(new Date());
-  const [dayStartOfYear, dayEndOfYear] = getStartAndEndOfYear(toDay);
-  const [renvenueMonthSelected, setRenvenueMonthSelected] = useState<any>();
-
-  const mutateGetRevenueByTime = useMutation({
-    mutationFn: RevenueApis.getByTime,
-    onSuccess: (data, variables) => {
-      if (variables.type === 'month') {
-        setDatasetsChart([
-          {
-            type: 'bar' as const,
-            label: `Doanh thu ${dayjs(toDay).year()}`,
-            data: data?.revenue_by_time?.map((item: any) => item.total_revenue),
-            backgroundColor: 'rgb(53, 162, 235)',
-          },
-        ]);
-      } else {
-        setDatasetsChartDay([
-          {
-            type: 'bar' as const,
-            label: `Doanh thu tháng ${dayjs(variables.start_date).month() + 1}`,
-            data: data?.revenue_by_time?.map((item: any) => item.total_revenue),
-            backgroundColor: 'rgb(53, 162, 235)',
-          },
-        ]);
-      }
+  const items: TabsProps['items'] = [
+    {
+      key: '1',
+      label: 'Doanh thu theo thời gian',
+      children: <RevenueByTimeTab />,
     },
-    onError: (error) => {
-      console.log('error', error);
+    {
+      key: '2',
+      label: 'Doanh thu theo sản phẩm',
+      children: <RevenueByProduct />,
     },
-  });
-
-  const mutateGetOverviewByTime = useMutation({
-    mutationFn: RevenueApis.getOverviewByTime,
-    onSuccess: (data, variables) => {
-      setRenvenueMonthSelected(data);
+    {
+      key: '3',
+      label: 'Doanh thu theo danh mục',
+      children: <RevenueByCategoryTab />,
     },
-    onError: (error) => {
-      console.log('error', error);
-    },
-  });
-
-  useEffect(() => {
-    // console.log('auth', auth);
-    if (user) {
-      mutateGetRevenueByTime.mutate({
-        type: 'month',
-        shop_id: user?._id,
-        start_date: formatDate(dayStartOfYear, 'YYYY-MM-DD'),
-        end_date: formatDate(dayEndOfYear, 'YYYY-MM-DD'),
-        interval: 'month',
-      });
-
-      mutateGetRevenueByTime.mutate({
-        type: 'day',
-        shop_id: user?._id,
-        start_date: formatDate(startDayofMonth, 'YYYY-MM-DD'),
-        end_date: formatDate(endDayOfMonth, 'YYYY-MM-DD'),
-        interval: 'day',
-      });
-
-      mutateGetOverviewByTime.mutate({
-        shop_id: user?._id,
-        start_date: formatDate(startDayofMonth, 'YYYY-MM-DD'),
-        end_date: formatDate(endDayOfMonth, 'YYYY-MM-DD'),
-      });
-    }
-  }, [user]);
-
-  const handleDownload = () => {
-    toastSucess('Tải thành công');
-  };
-
-  const chartRef = useRef<ChartJS>(null);
-
-  const onClick = (event: MouseEvent<HTMLCanvasElement>) => {
-    const { current: chart } = chartRef;
-
-    if (!chart) {
-      return;
-    }
-    const element = getElementAtEvent(chart, event);
-    if (!element.length) return;
-
-    const { datasetIndex, index } = element[0];
-
-    const [startDay, endDay] = getStartAndEndOfMonth(toDay, index);
-
-    mutateGetRevenueByTime.mutate({
-      type: 'day',
-      shop_id: user?._id,
-      start_date: formatDate(startDay, 'YYYY-MM-DD'),
-      end_date: formatDate(endDay, 'YYYY-MM-DD'),
-      interval: 'day',
-    });
-
-    mutateGetOverviewByTime.mutate({
-      shop_id: user?._id,
-      start_date: formatDate(startDay, 'YYYY-MM-DD'),
-      end_date: formatDate(endDay, 'YYYY-MM-DD'),
-    });
-  };
+  ];
 
   return (
     <Flex className="pt-7 pb-5 px-8" vertical gap={10}>
@@ -244,7 +115,9 @@ const DashboardPage = () => {
         </Col>
       </Row> */}
 
-      <Row gutter={[20, 15]}>
+      <Tabs defaultActiveKey="1" items={items} />
+
+      {/* <Row gutter={[20, 15]}>
         <Col span={20} className="min-w-[600px]">
           <Space
             direction="vertical"
@@ -311,7 +184,7 @@ const DashboardPage = () => {
             // isRaise={false}
           />
         </Col>
-      </Row>
+      </Row> */}
     </Flex>
   );
 };
