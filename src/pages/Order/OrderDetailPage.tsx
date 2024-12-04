@@ -2,12 +2,17 @@ import { useMutation } from '@tanstack/react-query';
 import { Col, Flex, Image, Row, Space, Steps, Typography } from 'antd';
 import OrderApis, { StatusOrder } from 'apis/OrderApis';
 import { RollBackIcon } from 'assets/svgs';
+import Button from 'components/Button/Button';
+import ButtonCustom from 'components/Button/ButtonCustom';
 import SpaceCustom from 'components/Space/SpaceCustom';
 import LableCustom from 'components/Text/LableCustom';
 import TextCustom from 'components/Text/TextCustom';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import formatNumber, { formatDate, generateUUID } from 'utils/function';
+import PopupHandleOrder from './PopupHandleOrder';
+import { toastSucess } from 'utils/toats';
+import { useUser } from 'contexts/UserProvider';
 
 interface ICurrentStep {
   current: number;
@@ -16,12 +21,16 @@ interface ICurrentStep {
 
 const OrderDetailPage = () => {
   const navigate = useNavigate();
+  const { user } = useUser();
   const { id } = useParams<{ id: string }>();
   const [itemSteps, setItemSteps] = React.useState<any[]>([]);
   const [currentStep, setCurrentStep] = React.useState<ICurrentStep>({
     current: 0,
     status: 'finish',
   });
+  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const [isCancelOrder, setIsCancelOrder] = useState<boolean>(false);
+  const [orderIdHandle, setOrderIdHandle] = useState<string>('');
 
   const mutateGetOrderById = useMutation({
     mutationFn: OrderApis.getById,
@@ -58,6 +67,17 @@ const OrderDetailPage = () => {
     },
   });
 
+  const mutateUpdateStatusById = useMutation({
+    mutationFn: OrderApis.updateStatusById,
+    onSuccess: (data) => {
+      toastSucess('Cập nhật thành công');
+      mutateGetOrderById.mutate({ orderId: id });
+    },
+    onError: (error) => {
+      console.log('error', error);
+    },
+  });
+
   useEffect(() => {
     mutateGetOrderById.mutate({ orderId: id });
   }, []);
@@ -79,6 +99,21 @@ const OrderDetailPage = () => {
       default:
         return -1;
     }
+  };
+
+  const handleOk = useCallback(() => {
+    setIsOpenModal(false);
+    mutateUpdateStatusById.mutate({
+      orderId: orderIdHandle,
+      status: isCancelOrder ? 'CANCELED' : 'DELIVERY',
+    });
+  }, [isOpenModal, orderIdHandle]);
+
+  const handleAction = (e: any, orderId: any, isCancel: boolean) => {
+    e.stopPropagation();
+    setIsOpenModal(true);
+    setIsCancelOrder(isCancel);
+    setOrderIdHandle(orderId);
   };
 
   return (
@@ -161,36 +196,63 @@ const OrderDetailPage = () => {
             ),
           )}
         </SpaceCustom>
-        <SpaceCustom
-          direction="vertical"
-          width="40%"
-          className="h-max"
-          size={0}
-        >
-          <Row justify={'space-between'} className="!m-0 !p-0">
-            <LableCustom value={`Tiền sản phẩm: `} />
-            <TextCustom
-              value={formatNumber(
-                mutateGetOrderById.data?.total_amount -
-                  mutateGetOrderById.data?.fee_ship,
-              )}
-            />
-          </Row>
-          <Row justify={'space-between'} className="!m-0 !p-0">
-            <LableCustom value={`Phí vận chuyển: `} />
-            <TextCustom
-              value={formatNumber(mutateGetOrderById.data?.fee_ship)}
-            />
-          </Row>
-          <div className="border-2 mb-2" />
-          <Row justify={'space-between'}>
-            <LableCustom value={`Tổng tiền: `} />
-            <TextCustom
-              value={formatNumber(mutateGetOrderById.data?.total_amount)}
-            />
-          </Row>
-        </SpaceCustom>
+        <div className="w-2/5">
+          <SpaceCustom
+            direction="vertical"
+            // width="40%"
+            className="h-max"
+            size={0}
+          >
+            <Row justify={'space-between'} className="!m-0 !p-0">
+              <LableCustom value={`Tiền sản phẩm: `} />
+              <TextCustom
+                value={formatNumber(
+                  mutateGetOrderById.data?.total_amount -
+                    mutateGetOrderById.data?.fee_ship,
+                )}
+              />
+            </Row>
+            <Row justify={'space-between'} className="!m-0 !p-0">
+              <LableCustom value={`Phí vận chuyển: `} />
+              <TextCustom
+                value={formatNumber(mutateGetOrderById.data?.fee_ship)}
+              />
+            </Row>
+            <div className="border-2 mb-2" />
+            <Row justify={'space-between'}>
+              <LableCustom value={`Tổng tiền: `} />
+              <TextCustom
+                value={formatNumber(mutateGetOrderById.data?.total_amount)}
+              />
+            </Row>
+          </SpaceCustom>
+          {mutateGetOrderById.data?.status == 'PREPARING' && (
+            <Row className="mt-2" gutter={[12, 12]} justify={'end'}>
+              <Col>
+                <Button
+                  title="Huỷ đơn"
+                  handleOnclick={(e) => handleAction(e, id, true)}
+                />
+              </Col>
+              <Col>
+                <Button
+                  title="Xác nhận đơn"
+                  fill
+                  handleOnclick={(e) => handleAction(e, id, false)}
+                />
+              </Col>
+            </Row>
+          )}
+        </div>
       </Flex>
+
+      <PopupHandleOrder
+        isOpen={isOpenModal}
+        setIsOpen={setIsOpenModal}
+        isCancel={isCancelOrder}
+        handleOk={handleOk}
+        // handleCancel={handleCancel}
+      />
     </Space>
   );
 };
