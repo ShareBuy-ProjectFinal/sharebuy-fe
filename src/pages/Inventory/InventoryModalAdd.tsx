@@ -231,6 +231,8 @@ const InventoryModalAdd = (props: IProps) => {
   useEffect(() => {
     if (user) {
       //   mutateProductByShopId.mutate({ id: user?._id, page: 0, page_size: 10 });
+      setDataNewInventory([]);
+      form.resetFields();
     }
   }, [isOpen, user]);
 
@@ -308,6 +310,7 @@ const InventoryModalAdd = (props: IProps) => {
         origin_price: item.price,
       })),
     });
+    console.log('dataNewInventory', dataNewInventory);
   };
 
   const onCancel = () => {
@@ -545,6 +548,7 @@ const InventoryModalAdd = (props: IProps) => {
                 const attribute = res.custom_attribute_values
                   .map((item: any) => item.value)
                   .join(', ');
+                newObj.product_detail_id = res._id;
                 newObj.product_id = res.product._id;
                 newObj.product_name = res.product.product_name;
                 newObj.attribute = attribute;

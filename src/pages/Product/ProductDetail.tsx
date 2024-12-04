@@ -205,7 +205,7 @@ const ProductDetail = () => {
       setDataProDetails(
         data.map((proDetail: any) => ({
           _id: proDetail._id,
-          sub_id: '#' + proDetail.sub_id,
+          sub_id: proDetail.sub_id,
           price: proDetail.price,
           old_price: proDetail.old_price,
           quantity: proDetail.quantity,

@@ -212,7 +212,7 @@ const AddProductPage = () => {
         mutateAddProductDetail.mutate({
           product_id: data._id as string,
           name: data.product_name, // Provide appropriate value
-          old_price: item.price, // Provide appropriate value
+          old_price: item.old_price, // Provide appropriate value
           price: item.price, // Provide appropriate value
           quantity: item.quantity, // Provide appropriate value
           image: item?.imageUrl, // Provide appropriate value
@@ -221,7 +221,7 @@ const AddProductPage = () => {
         });
       });
       toastSucess('Thêm sản phẩm thành công');
-      navigate(PATH.productDetailById(data._id));
+      navigate(PATH.productDetailById(data._id), { replace: true });
     },
     onError: (error) => {
       console.log('error', error);
