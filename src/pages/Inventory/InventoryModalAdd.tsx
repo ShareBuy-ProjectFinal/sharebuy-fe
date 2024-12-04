@@ -310,7 +310,6 @@ const InventoryModalAdd = (props: IProps) => {
         origin_price: item.price,
       })),
     });
-    console.log('dataNewInventory', dataNewInventory);
   };
 
   const onCancel = () => {
