@@ -29,3 +29,4 @@ export { ReactComponent as EditIcon } from './Edit.svg';
 export { ReactComponent as DeleteIcon } from './Delete.svg';
 export { ReactComponent as AddBoxIcon } from './add_Box.svg';
 export { ReactComponent as AcceptIcon } from './Accept.svg';
+export { ReactComponent as DlAuthIcon } from './DLAuth.svg';
